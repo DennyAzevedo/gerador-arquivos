@@ -1,0 +1,30 @@
+# Backend Commit Rules
+
+Follow Conventional Commits.
+
+## Format
+- Use:
+  - feat: for new features
+  - fix: for bug fixes
+  - refactor: for internal improvements without behavior change
+  - docs: for documentation
+  - test: for tests
+  - style: for formatting-only changes
+  - chore: for maintenance
+  - perf: for performance improvements
+  - build: for build system or dependency changes
+  - ci: for CI/CD changes
+
+## Scope
+- Use a scope when it improves clarity:
+  - feat(payments): add payment registration use case
+  - fix(auth): reject expired tokens
+  - refactor(orders): extract pricing strategy
+  - test(users): add unit tests for user activation
+
+## Rules
+- Use imperative mood.
+- Do not end the subject with a period.
+- Keep the subject concise and clear.
+- Add a body when it helps explain what changed and why.
+- Focus on intent and behavior, not implementation noise.

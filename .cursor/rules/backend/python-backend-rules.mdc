@@ -1,0 +1,45 @@
+# Python Backend Rules
+
+## General
+- Prefer clarity and readability.
+- Use type hints everywhere.
+
+## Structure
+- Separate:
+  - api
+  - application
+  - domain
+  - infrastructure
+
+## Frameworks
+- Prefer FastAPI or similar modern frameworks.
+
+## Domain
+- Keep domain logic independent.
+- Avoid mixing ORM models with domain models.
+
+## Application
+- Use services/use cases.
+- Orchestrate domain logic here.
+
+## Persistence
+- Keep ORM (SQLAlchemy, etc.) in infrastructure.
+- Map models explicitly.
+
+## DTOs
+- Use Pydantic models for API.
+
+## Validation
+- Validate inputs explicitly.
+
+## Errors
+- Raise meaningful exceptions.
+- Handle errors centrally.
+
+## Testing
+- Use pytest.
+- Test domain logic separately.
+
+## Code Style
+- Follow PEP8.
+- Avoid large functions and modules.

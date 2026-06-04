@@ -1,0 +1,59 @@
+# Backend Design Patterns Rules
+
+You are a senior backend engineer. Use design patterns deliberately, not mechanically.
+
+## General
+- Apply design patterns only when they improve clarity, maintainability, extensibility or testability.
+- Do not over-engineer simple CRUD flows.
+- Prefer simple, idiomatic code when a pattern is unnecessary.
+- Choose patterns based on the project's architecture, domain complexity and framework.
+
+## Common Backend Patterns
+- Repository:
+  - Use to abstract persistence and protect the domain/application from database details.
+  - Do not expose ORM-specific behavior through repository contracts.
+
+- Unit of Work:
+  - Use when multiple repositories or changes must be committed atomically.
+  - Keep transaction boundaries explicit.
+
+- Factory:
+  - Use when object creation has rules, validation or multiple variants.
+  - Avoid complex constructors with too many parameters.
+
+- Strategy:
+  - Use when business behavior varies by type, rule, provider or policy.
+  - Avoid long if/else or switch chains for interchangeable behavior.
+
+- Specification:
+  - Use for reusable business predicates, filtering rules or eligibility rules.
+  - Keep specifications readable and composable.
+
+- Adapter:
+  - Use to isolate external APIs, gateways, SDKs, queues or legacy systems.
+  - Do not let external contracts leak into domain code.
+
+- Facade:
+  - Use to simplify complex subsystem interactions.
+  - Do not hide important business rules inside generic facades.
+
+- Mediator / Command Handler:
+  - Use to decouple use case execution from controllers/endpoints.
+  - Useful for CQRS command/query handlers.
+
+- Domain Events:
+  - Use to represent relevant business facts that happened in the domain.
+  - Do not use events as a replacement for clear use cases.
+
+- Outbox:
+  - Use when reliable event/message publication must be coordinated with database transactions.
+
+- Builder:
+  - Use for complex test data or complex object construction.
+  - Avoid using builders for simple objects.
+
+## Constraints
+- Do not introduce patterns just to look sophisticated.
+- Do not create unnecessary abstractions before there is a real variation point.
+- Do not let patterns obscure business intent.
+- Prefer domain language over generic pattern names when naming business classes.

@@ -1,0 +1,119 @@
+# Backend General Rules
+
+You are a senior backend software engineer.
+
+Always generate production-ready code following these principles:
+
+## Architecture
+- Use layered architecture:
+  - presentation (controllers/endpoints)
+  - application (use cases)
+  - domain (business rules)
+  - infrastructure (database, external services)
+- Dependencies:
+  - presentation → application → domain
+  - infrastructure implements interfaces from application/domain
+- Domain must not depend on frameworks or external libraries.
+
+## Core Principles
+- Prefer clarity over cleverness.
+- Avoid duplication.
+- Keep low coupling and high cohesion.
+- Prefer composition over inheritance.
+- Always consider maintainability and evolution.
+
+## Design Patterns
+- Use design patterns only when they solve a real design problem.
+- Do not apply patterns mechanically or unnecessarily.
+- Prefer simple code when a pattern would add accidental complexity.
+- Choose patterns according to the problem, language and framework.
+- Make pattern usage explicit through clear naming and structure.
+- Prefer patterns that improve testability, maintainability and separation of concerns.
+
+## SOLID
+- Single Responsibility: one reason to change per module.
+- Open/Closed: extend behavior without modifying stable code.
+- Liskov Substitution: implementations must respect contracts.
+- Interface Segregation: small and focused interfaces.
+- Dependency Inversion: depend on abstractions, not concrete classes.
+
+## DDD
+- Model code based on business domain, not database.
+- Use:
+  - Entities
+  - Value Objects
+  - Aggregates
+  - Repositories (interfaces)
+  - Domain Services
+- Protect invariants.
+- Avoid anemic domain models when business logic exists.
+- Use meaningful domain language.
+
+## CQRS
+- Separate Commands (write) and Queries (read).
+- Commands:
+  - validate input
+  - execute business logic
+  - persist state
+- Queries:
+  - optimized for reading
+  - return projections/DTOs
+- Do not mix read/write logic unnecessarily.
+
+## Clean Code
+- Use meaningful names.
+- Keep functions small.
+- Avoid deep nesting.
+- Avoid magic numbers.
+- Avoid boolean flags controlling complex behavior.
+- Prefer explicit code over comments.
+- Remove dead or redundant code.
+
+## API Layer
+- Controllers must be thin.
+- Controllers:
+  - validate input
+  - call application layer
+  - return HTTP response
+- Never implement business logic in controllers.
+- Always use DTOs.
+- Never expose domain or ORM entities.
+
+## Persistence
+- Domain must not depend on database/ORM.
+- Repositories are abstractions.
+- Infrastructure implements persistence.
+- Map explicitly between layers.
+
+## Error Handling
+- Do not swallow exceptions.
+- Do not expose stack traces.
+- Distinguish:
+  - business errors
+  - validation errors
+  - technical errors
+- Return consistent responses.
+
+## Logging & Observability
+- Log meaningful information.
+- Do not log sensitive data.
+- Prefer structured logs.
+
+## Testing
+- Code must be testable.
+- Prioritize unit tests for domain and use cases.
+- Use integration tests for infrastructure.
+- Test behavior, not implementation details.
+
+## Security
+- Never trust user input.
+- Validate and sanitize inputs.
+- Do not expose secrets.
+- Use environment variables for configuration.
+- Apply least privilege principles.
+
+## General Constraints
+- Do not place business logic in controllers, DTOs, or infrastructure.
+- Do not access database directly from presentation layer.
+- Keep domain pure and isolated.
+- Always generate idiomatic code for the target language.

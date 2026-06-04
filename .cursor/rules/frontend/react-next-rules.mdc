@@ -1,0 +1,60 @@
+# React and Next.js Rules
+
+## General
+- Use TypeScript in strict mode.
+- Prefer functional components.
+- Keep components small and focused.
+- Use explicit prop typing.
+- Prefer clear and descriptive names for props, handlers and utilities.
+
+## Organization
+- Organize by feature/domain first.
+- Inside each feature, separate concerns when useful:
+  - components
+  - hooks
+  - services
+  - mappers
+  - types
+  - validation
+  - tests
+
+## Components
+- Prefer composition over overly configurable components.
+- Avoid components with too many props.
+- Extract subcomponents when responsibilities diverge.
+- Keep JSX readable.
+- Move complex logic outside render.
+- Use named handlers such as handleClick, handleSubmit and handleChange.
+
+## Hooks
+- Use custom hooks to encapsulate reusable stateful logic.
+- Do not create hooks just to move trivial code around.
+- Keep hooks focused and well named.
+- Avoid hooks that mix unrelated responsibilities.
+
+## State and Async
+- Keep fetching logic outside purely presentational components.
+- Prefer typed service functions for external calls.
+- Always model loading, empty and error states explicitly.
+- Keep server state and UI state conceptually separated.
+
+## Next.js
+- Use server/client boundaries intentionally.
+- Default to server-side capabilities where appropriate.
+- Use client components only when interactivity, browser APIs or local state require them.
+- Keep route handlers, server actions and server-only modules clearly separated from client code.
+- Respect App Router conventions when using App Router.
+
+## Styling
+- Use Tailwind consistently when that is the project standard.
+- Prefer class composition helpers like cn(), clsx() or cva() when class composition grows.
+- Keep className readable and maintainable.
+
+## Accessibility
+- Use semantic elements first.
+- Ensure keyboard interaction works.
+- Use aria-* correctly, not excessively.
+
+## Testing
+- Test critical user flows.
+- Test hooks and utilities separately when logic is non-trivial.

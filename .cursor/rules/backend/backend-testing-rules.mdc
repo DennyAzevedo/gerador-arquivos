@@ -1,0 +1,68 @@
+# Backend Testing Rules
+
+## General
+- Write testable code by design.
+- Prefer testing behavior over implementation details.
+- Tests must validate business rules, application flows and integration points.
+
+## Test Location
+- Place tests in a dedicated test project or tests directory according to the stack.
+- Do not mix production code and test code in the same directory unless the language ecosystem strongly requires it.
+
+## Recommended Structure
+- Mirror the source structure in tests.
+
+Example:
+
+src/
+  features/
+    payments/
+      application/
+      domain/
+      infrastructure/
+
+tests/
+  features/
+    payments/
+      application/
+      domain/
+      infrastructure/
+
+## Scope
+- Unit tests:
+  - domain entities
+  - value objects
+  - domain services
+  - use cases
+  - validators
+  - mappers
+
+- Integration tests:
+  - repositories
+  - database access
+  - external service adapters
+  - messaging
+  - authentication/authorization flows where appropriate
+
+- API tests:
+  - endpoints/controllers
+  - request validation
+  - response contracts
+  - error responses
+
+## Principles
+- Use Arrange / Act / Assert.
+- Keep tests small, clear and deterministic.
+- Use meaningful test names.
+- Cover:
+  - happy path
+  - edge cases
+  - business rule violations
+  - expected failures
+
+## Constraints
+- Do not test framework behavior unnecessarily.
+- Do not rely on test execution order.
+- Do not use real external services in automated tests unless explicitly configured as integration tests.
+- Prefer mocks/fakes for external dependencies in unit tests.
+- Prefer real database containers or test databases for persistence integration tests when feasible.
