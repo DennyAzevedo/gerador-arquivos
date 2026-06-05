@@ -16,7 +16,7 @@ Roteiro de fases do projeto. **Este é um documento vivo**: a cada passo/fase co
 | 0 | Documentação e fundação | ✅ Concluído |
 | 1 | Infraestrutura (Docker Compose + Dockerfiles) | ✅ Concluído |
 | 2 | Backend — fundação (config, DB, domínio, camadas) | ✅ Concluído |
-| 3 | Backend — autenticação (JWT / fastapi-users) | ⬜ Pendente |
+| 3 | Backend — autenticação (JWT / fastapi-users) | ✅ Concluído |
 | 4 | Backend — geração de artigos (OpenAI) e CRUD | ⬜ Pendente |
 | 5 | Frontend — fundação (Vite + Mantine + Router) | ⬜ Pendente |
 | 6 | Frontend — autenticação (login/registro) | ⬜ Pendente |
@@ -63,14 +63,18 @@ Roteiro de fases do projeto. **Este é um documento vivo**: a cada passo/fase co
 
 > **Notas:** a `DATABASE_URL` precisou codificar o `@` da senha como `%40`. O backend usa layout `src/` com `PYTHONPATH=/app/src`. Validações: `/health` → `{"status":"ok"}` (200); `/health/ready` → `{"status":"ready","database":"connected"}` (200); tabelas `users`, `articles` e `alembic_version` confirmadas no banco.
 
-## Fase 3 — Backend: autenticação ⬜
+## Fase 3 — Backend: autenticação ✅
 
-- [ ] Integração `fastapi-users` (registro, login JWT)
-- [ ] Repositório de usuários (abstração + implementação)
-- [ ] DTOs Pydantic (`UserRead`, `UserCreate`)
-- [ ] Endpoint `/users/me`
-- [ ] Proteção de rotas por token
-- [ ] Validar fluxo de auth via `/docs`
+- [x] Integração `fastapi-users` (registro, login JWT) — wiring em `infrastructure/auth`
+- [x] Repositório de usuários: port `UserRepository` (domínio) + `SqlAlchemyUserRepository` (infra) + mapper ORM→domínio + provider de DI
+- [x] DTOs Pydantic (`UserRead`, `UserCreate`, `UserUpdate`)
+- [x] Endpoint `/users/me` (via `get_users_router`)
+- [x] Proteção de rotas por token (`current_active_user`)
+- [x] Validar fluxo de auth
+
+> **Endpoints:** `POST /auth/register`, `POST /auth/jwt/login`, `GET /users/me`. Estratégia JWT (Bearer), expiração 3600s.
+>
+> **Validação:** registro → `201`; login → `access_token`; `GET /users/me` com token → `200`; sem token → `401`. Usuário de teste removido após a validação. O `UserRepository` é a interface de domínio que será consumida pelos casos de uso de artigos (Fase 4); a persistência de auth usa o adapter do `fastapi-users`.
 
 ## Fase 4 — Backend: artigos e OpenAI ⬜
 
@@ -139,3 +143,4 @@ Registre aqui cada avanço relevante (data, fase, resumo).
 | 2026-06-05 | 0 | Criada a documentação inicial em `docs/` (stack, planejamento, regras e etapas). |
 | 2026-06-05 | 1 | Infraestrutura criada: `docker-compose.yml` (backend + frontend), Dockerfiles e `.env.example`. PostgreSQL passou a ser o container existente `db-postgres` (banco `gerador_artigos`), acessado via `host.docker.internal`. Validados `compose config` e conectividade ao banco. |
 | 2026-06-05 | 2 | Backend fundacional em camadas (DDD): config, sessão async, entidades de domínio puras, modelos ORM (`users`, `articles`), Alembic async com migração `0001` e endpoints `/health` e `/health/ready`. Imagem construída, migração aplicada e endpoints validados (DB conectado). |
+| 2026-06-05 | 3 | Autenticação JWT com `fastapi-users`: wiring (user manager, auth backend, instance), DTOs, `UserRepository` (port + impl SQLAlchemy + mapper) e routers de auth/register/users. Fluxo validado: registro (201), login (token), `/users/me` com token (200) e sem token (401). |
