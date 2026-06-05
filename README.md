@@ -4,6 +4,15 @@ Gerador de artigos com Inteligência Artificial para publicação em blog WordPr
 
 > **Nota sobre o desenvolvimento:** Este projeto é desenvolvido integralmente com o [Cursor](https://cursor.com) como ferramenta de codificação assistida por IA, **sem intervenção manual no código**. O objetivo é validar e demonstrar um fluxo de desenvolvimento orientado por agentes de IA.
 
+## Documentação
+
+A documentação completa do projeto está na pasta [`docs/`](docs/README.md):
+
+- [01 — Stack Tecnológica](docs/01-stack.md)
+- [02 — Planejamento e Arquitetura](docs/02-planejamento.md)
+- [03 — Regras de Codificação](docs/03-regras-codificacao.md)
+- [04 — Etapas de Execução](docs/04-etapas-execucao.md) (roteiro vivo, atualizado a cada fase)
+
 ## Visão Geral
 
 O objetivo do projeto é automatizar a criação e publicação de artigos em um blog WordPress, reduzindo o esforço manual de produção de conteúdo. O fluxo geral é:
