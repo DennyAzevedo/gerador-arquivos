@@ -18,7 +18,7 @@ Roteiro de fases do projeto. **Este é um documento vivo**: a cada passo/fase co
 | 2 | Backend — fundação (config, DB, domínio, camadas) | ✅ Concluído |
 | 3 | Backend — autenticação (JWT / fastapi-users) | ✅ Concluído |
 | 4 | Backend — geração de artigos (OpenAI) e CRUD | ✅ Concluído |
-| 5 | Frontend — fundação (Vite + Mantine + Router) | ⬜ Pendente |
+| 5 | Frontend — fundação (Vite + Mantine + Router) | ✅ Concluído |
 | 6 | Frontend — autenticação (login/registro) | ⬜ Pendente |
 | 7 | Frontend — geração e gestão de artigos | ⬜ Pendente |
 | 8 | Integração ponta a ponta e ajustes de UX | ⬜ Pendente |
@@ -91,14 +91,16 @@ Roteiro de fases do projeto. **Este é um documento vivo**: a cada passo/fase co
 >
 > **Validação:** CREATE `201`, LIST `200`, GET `200`, UPDATE `200` (status `draft`→`published`, `updated_at` alterado), GET inexistente `404`, DELETE `204`, GET pós-delete `404`. `GENERATE` com chave placeholder retornou `502` limpo (com chave válida, gera o artigo). Dados de teste removidos.
 
-## Fase 5 — Frontend: fundação ⬜
+## Fase 5 — Frontend: fundação ✅
 
-- [ ] Scaffold Vite + React + TypeScript (strict)
-- [ ] Instalar Mantine, TanStack Query, React Router, Axios
-- [ ] `main.tsx` com providers (Mantine, Query, Router)
-- [ ] `app/layout` com `AppShell`
-- [ ] Cliente HTTP em `shared/api` com interceptor de token
-- [ ] Validar app rodando no container
+- [x] Scaffold Vite + React + TypeScript (strict) — `tsconfig` com `strict`, `noUnusedLocals/Parameters`
+- [x] Dependências instaladas: Mantine 9.3, TanStack Query 5, React Router 7, Axios 1, React 19, Vite 8
+- [x] `main.tsx` com providers (`MantineProvider`, `QueryClientProvider`, `BrowserRouter`, `Notifications`)
+- [x] `app/layout/MainLayout` com `AppShell` + `HomePage` + roteamento
+- [x] Cliente HTTP em `shared/api/client.ts` (axios) com interceptor de token + `shared/lib/authStorage`
+- [x] App validado rodando no container
+
+> **Estrutura:** `src/app` (layout, pages, App/rotas), `src/features` (auth/articles — Fases 6/7), `src/shared` (api, lib). Versões resolvidas via npm (sem inventar). Validação: Vite ready, `GET /` 200, `/src/main.tsx` 200, `tsc --noEmit` sem erros, lints limpos.
 
 ## Fase 6 — Frontend: autenticação ⬜
 
@@ -149,3 +151,4 @@ Registre aqui cada avanço relevante (data, fase, resumo).
 | 2026-06-05 | 2 | Backend fundacional em camadas (DDD): config, sessão async, entidades de domínio puras, modelos ORM (`users`, `articles`), Alembic async com migração `0001` e endpoints `/health` e `/health/ready`. Imagem construída, migração aplicada e endpoints validados (DB conectado). |
 | 2026-06-05 | 3 | Autenticação JWT com `fastapi-users`: wiring (user manager, auth backend, instance), DTOs, `UserRepository` (port + impl SQLAlchemy + mapper) e routers de auth/register/users. Fluxo validado: registro (201), login (token), `/users/me` com token (200) e sem token (401). |
 | 2026-06-05 | 4 | Artigos (CQRS + OpenAI): porta `ArticleGenerator` + adapter OpenAI, `ArticleRepository` (port + impl + mapper), casos de uso de geração e CRUD com checagem de propriedade, DTOs e endpoints `/articles/*` e `/articles/generate`. Handlers de erro (404/502). CRUD validado ponta a ponta; `generate` com erro tratado (502). |
+| 2026-06-05 | 5 | Frontend fundacional: scaffold Vite + React 19 + TS strict, Mantine 9, TanStack Query 5, React Router 7 e Axios. Providers em `main.tsx`, layout `AppShell`, `HomePage`, cliente HTTP com interceptor de token e `authStorage`. Container validado (Vite servindo, typecheck e lints OK). |
