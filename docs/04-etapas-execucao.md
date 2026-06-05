@@ -15,7 +15,7 @@ Roteiro de fases do projeto. **Este é um documento vivo**: a cada passo/fase co
 | ---- | --------- | ------ |
 | 0 | Documentação e fundação | ✅ Concluído |
 | 1 | Infraestrutura (Docker Compose + Dockerfiles) | ✅ Concluído |
-| 2 | Backend — fundação (config, DB, domínio, camadas) | ⬜ Pendente |
+| 2 | Backend — fundação (config, DB, domínio, camadas) | ✅ Concluído |
 | 3 | Backend — autenticação (JWT / fastapi-users) | ⬜ Pendente |
 | 4 | Backend — geração de artigos (OpenAI) e CRUD | ⬜ Pendente |
 | 5 | Frontend — fundação (Vite + Mantine + Router) | ⬜ Pendente |
@@ -49,17 +49,19 @@ Roteiro de fases do projeto. **Este é um documento vivo**: a cada passo/fase co
 - [x] Validar conectividade com o Postgres via `host.docker.internal` (`pg_isready` OK)
 - [ ] Build/boot completo de `backend` e `frontend` — depende dos manifestos criados nas Fases 2 e 5
 
-## Fase 2 — Backend: fundação ⬜
+## Fase 2 — Backend: fundação ✅
 
-- [ ] Estrutura de pastas em camadas (`api`, `application`, `domain`, `infrastructure`)
-- [ ] `requirements.txt` / `pyproject.toml`
-- [ ] `core/config.py` (settings via env)
-- [ ] `infrastructure/db/session.py` (engine async + sessão)
-- [ ] Modelos de domínio (`User`, `Article`) isolados do ORM
-- [ ] Modelos ORM em `infrastructure/db/models`
-- [ ] Alembic configurado + migração inicial
-- [ ] Endpoint `/health`
-- [ ] Validar boot do backend conectando ao Postgres
+- [x] Estrutura de pastas em camadas (`api`, `application`, `domain`, `infrastructure`)
+- [x] `requirements.txt` e `pyproject.toml`
+- [x] `core/config.py` (settings via env, com `pydantic-settings`)
+- [x] `infrastructure/db/session.py` (engine async + sessão)
+- [x] Modelos de domínio (`User`, `Article`) isolados do ORM (dataclasses puras)
+- [x] Modelos ORM em `infrastructure/db/models` (User compatível com fastapi-users)
+- [x] Alembic configurado (async) + migração inicial `0001` (tabelas `users` e `articles`)
+- [x] Endpoints `/health` (liveness) e `/health/ready` (readiness com checagem de DB)
+- [x] Build do backend, migração aplicada e boot validado conectando ao Postgres
+
+> **Notas:** a `DATABASE_URL` precisou codificar o `@` da senha como `%40`. O backend usa layout `src/` com `PYTHONPATH=/app/src`. Validações: `/health` → `{"status":"ok"}` (200); `/health/ready` → `{"status":"ready","database":"connected"}` (200); tabelas `users`, `articles` e `alembic_version` confirmadas no banco.
 
 ## Fase 3 — Backend: autenticação ⬜
 
@@ -136,3 +138,4 @@ Registre aqui cada avanço relevante (data, fase, resumo).
 | ---- | ---- | ------ |
 | 2026-06-05 | 0 | Criada a documentação inicial em `docs/` (stack, planejamento, regras e etapas). |
 | 2026-06-05 | 1 | Infraestrutura criada: `docker-compose.yml` (backend + frontend), Dockerfiles e `.env.example`. PostgreSQL passou a ser o container existente `db-postgres` (banco `gerador_artigos`), acessado via `host.docker.internal`. Validados `compose config` e conectividade ao banco. |
+| 2026-06-05 | 2 | Backend fundacional em camadas (DDD): config, sessão async, entidades de domínio puras, modelos ORM (`users`, `articles`), Alembic async com migração `0001` e endpoints `/health` e `/health/ready`. Imagem construída, migração aplicada e endpoints validados (DB conectado). |
