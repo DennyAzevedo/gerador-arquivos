@@ -17,7 +17,7 @@ Roteiro de fases do projeto. **Este é um documento vivo**: a cada passo/fase co
 | 1 | Infraestrutura (Docker Compose + Dockerfiles) | ✅ Concluído |
 | 2 | Backend — fundação (config, DB, domínio, camadas) | ✅ Concluído |
 | 3 | Backend — autenticação (JWT / fastapi-users) | ✅ Concluído |
-| 4 | Backend — geração de artigos (OpenAI) e CRUD | ⬜ Pendente |
+| 4 | Backend — geração de artigos (OpenAI) e CRUD | ✅ Concluído |
 | 5 | Frontend — fundação (Vite + Mantine + Router) | ⬜ Pendente |
 | 6 | Frontend — autenticação (login/registro) | ⬜ Pendente |
 | 7 | Frontend — geração e gestão de artigos | ⬜ Pendente |
@@ -76,16 +76,20 @@ Roteiro de fases do projeto. **Este é um documento vivo**: a cada passo/fase co
 >
 > **Validação:** registro → `201`; login → `access_token`; `GET /users/me` com token → `200`; sem token → `401`. Usuário de teste removido após a validação. O `UserRepository` é a interface de domínio que será consumida pelos casos de uso de artigos (Fase 4); a persistência de auth usa o adapter do `fastapi-users`.
 
-## Fase 4 — Backend: artigos e OpenAI ⬜
+## Fase 4 — Backend: artigos e OpenAI ✅
 
-- [ ] Adapter da OpenAI em `infrastructure/openai`
-- [ ] Porta (interface) do gerador na camada de aplicação
-- [ ] Caso de uso de geração (command) — não persiste
-- [ ] Repositório de artigos (abstração + implementação)
-- [ ] Casos de uso CRUD (commands/queries)
-- [ ] DTOs de artigo (request/response)
-- [ ] Endpoints `/articles/*` e `/articles/generate`
-- [ ] Validar geração e CRUD via `/docs`
+- [x] Adapter da OpenAI em `infrastructure/openai` (`OpenAIArticleGenerator`, JSON mode)
+- [x] Porta `ArticleGenerator` na camada de aplicação (+ `ArticleGenerationInput`/`GeneratedArticle`)
+- [x] Caso de uso de geração (`GenerateArticleUseCase`) — não persiste
+- [x] Repositório de artigos: port `ArticleRepository` (domínio) + `SqlAlchemyArticleRepository` + mapper
+- [x] Casos de uso CQRS: commands (create/update/delete) e queries (list/get), com checagem de propriedade
+- [x] DTOs de artigo (`GenerateArticleRequest`, `ArticleCreateRequest`, `ArticleUpdateRequest`, `ArticleResponse`, etc.)
+- [x] Endpoints `POST /articles/generate`, `POST/GET/PUT/DELETE /articles[...]`
+- [x] Validar geração e CRUD
+
+> **Tratamento de erros:** `ArticleNotFoundError` → handler global `404`; `ArticleGenerationError` → `502` (sem stack trace). Acesso a artigos sempre filtrado por `user_id` (não-proprietário recebe `404`).
+>
+> **Validação:** CREATE `201`, LIST `200`, GET `200`, UPDATE `200` (status `draft`→`published`, `updated_at` alterado), GET inexistente `404`, DELETE `204`, GET pós-delete `404`. `GENERATE` com chave placeholder retornou `502` limpo (com chave válida, gera o artigo). Dados de teste removidos.
 
 ## Fase 5 — Frontend: fundação ⬜
 
@@ -144,3 +148,4 @@ Registre aqui cada avanço relevante (data, fase, resumo).
 | 2026-06-05 | 1 | Infraestrutura criada: `docker-compose.yml` (backend + frontend), Dockerfiles e `.env.example`. PostgreSQL passou a ser o container existente `db-postgres` (banco `gerador_artigos`), acessado via `host.docker.internal`. Validados `compose config` e conectividade ao banco. |
 | 2026-06-05 | 2 | Backend fundacional em camadas (DDD): config, sessão async, entidades de domínio puras, modelos ORM (`users`, `articles`), Alembic async com migração `0001` e endpoints `/health` e `/health/ready`. Imagem construída, migração aplicada e endpoints validados (DB conectado). |
 | 2026-06-05 | 3 | Autenticação JWT com `fastapi-users`: wiring (user manager, auth backend, instance), DTOs, `UserRepository` (port + impl SQLAlchemy + mapper) e routers de auth/register/users. Fluxo validado: registro (201), login (token), `/users/me` com token (200) e sem token (401). |
+| 2026-06-05 | 4 | Artigos (CQRS + OpenAI): porta `ArticleGenerator` + adapter OpenAI, `ArticleRepository` (port + impl + mapper), casos de uso de geração e CRUD com checagem de propriedade, DTOs e endpoints `/articles/*` e `/articles/generate`. Handlers de erro (404/502). CRUD validado ponta a ponta; `generate` com erro tratado (502). |

@@ -1,10 +1,19 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import JSONResponse
 
-from app.api.routes import health
+from app.api.routes import articles, health
 from app.api.schemas.user import UserCreate, UserRead, UserUpdate
 from app.core.config import settings
+from app.domain.articles.exceptions import ArticleNotFoundError
 from app.infrastructure.auth import auth_backend, fastapi_users
+
+
+async def article_not_found_handler(
+    request: Request,
+    exc: ArticleNotFoundError,
+) -> JSONResponse:
+    return JSONResponse(status_code=404, content={"detail": "Artigo não encontrado"})
 
 
 def create_app() -> FastAPI:
@@ -17,6 +26,8 @@ def create_app() -> FastAPI:
         allow_methods=["*"],
         allow_headers=["*"],
     )
+
+    app.add_exception_handler(ArticleNotFoundError, article_not_found_handler)
 
     app.include_router(health.router)
     app.include_router(
@@ -34,6 +45,7 @@ def create_app() -> FastAPI:
         prefix="/users",
         tags=["users"],
     )
+    app.include_router(articles.router)
 
     return app
 
