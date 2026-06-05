@@ -19,7 +19,7 @@ Roteiro de fases do projeto. **Este é um documento vivo**: a cada passo/fase co
 | 3 | Backend — autenticação (JWT / fastapi-users) | ✅ Concluído |
 | 4 | Backend — geração de artigos (OpenAI) e CRUD | ✅ Concluído |
 | 5 | Frontend — fundação (Vite + Mantine + Router) | ✅ Concluído |
-| 6 | Frontend — autenticação (login/registro) | ⬜ Pendente |
+| 6 | Frontend — autenticação (login/registro) | ✅ Concluído |
 | 7 | Frontend — geração e gestão de artigos | ⬜ Pendente |
 | 8 | Integração ponta a ponta e ajustes de UX | ⬜ Pendente |
 | 9 | Testes automatizados | ⬜ Pendente |
@@ -102,13 +102,15 @@ Roteiro de fases do projeto. **Este é um documento vivo**: a cada passo/fase co
 
 > **Estrutura:** `src/app` (layout, pages, App/rotas), `src/features` (auth/articles — Fases 6/7), `src/shared` (api, lib). Versões resolvidas via npm (sem inventar). Validação: Vite ready, `GET /` 200, `/src/main.tsx` 200, `tsc --noEmit` sem erros, lints limpos.
 
-## Fase 6 — Frontend: autenticação ⬜
+## Fase 6 — Frontend: autenticação ✅
 
-- [ ] Feature `auth` (domain, services, hooks, components, pages)
-- [ ] Páginas de Login e Registro com validação (`@mantine/form`)
-- [ ] Contexto/estado de autenticação + rotas protegidas
-- [ ] Estados de loading e erro tratados
-- [ ] Validar login/registro integrados ao backend
+- [x] Feature `auth`: `domain/types`, `services/authService`, `hooks` (useLogin/useRegister), `context/AuthContext`, `components` e `pages`
+- [x] Páginas de Login e Registro com validação (`@mantine/form`)
+- [x] `AuthContext` (bootstrap via `/users/me`) + `RequireAuth` (rotas protegidas)
+- [x] Estados de loading (botões/loader) e erro (`Alert` + `getApiErrorMessage`) tratados
+- [x] Login/registro integrados ao backend validados
+
+> **Fluxo:** `/login` e `/register` públicos; demais rotas sob `RequireAuth` (redireciona p/ `/login`). Token em `localStorage`, injetado pelo interceptor do axios. Logout no header do `AppShell`. **Validação:** typecheck strict OK, lints OK, CORS p/ `localhost:5173` OK, registro (201), login (token) e `/users/me` (200) confirmados com os mesmos contratos do `authService`. (A interação visual deve ser conferida no navegador.)
 
 ## Fase 7 — Frontend: artigos ⬜
 
@@ -152,3 +154,4 @@ Registre aqui cada avanço relevante (data, fase, resumo).
 | 2026-06-05 | 3 | Autenticação JWT com `fastapi-users`: wiring (user manager, auth backend, instance), DTOs, `UserRepository` (port + impl SQLAlchemy + mapper) e routers de auth/register/users. Fluxo validado: registro (201), login (token), `/users/me` com token (200) e sem token (401). |
 | 2026-06-05 | 4 | Artigos (CQRS + OpenAI): porta `ArticleGenerator` + adapter OpenAI, `ArticleRepository` (port + impl + mapper), casos de uso de geração e CRUD com checagem de propriedade, DTOs e endpoints `/articles/*` e `/articles/generate`. Handlers de erro (404/502). CRUD validado ponta a ponta; `generate` com erro tratado (502). |
 | 2026-06-05 | 5 | Frontend fundacional: scaffold Vite + React 19 + TS strict, Mantine 9, TanStack Query 5, React Router 7 e Axios. Providers em `main.tsx`, layout `AppShell`, `HomePage`, cliente HTTP com interceptor de token e `authStorage`. Container validado (Vite servindo, typecheck e lints OK). |
+| 2026-06-05 | 6 | Frontend auth: feature `auth` completa (types, service, hooks de mutation, `AuthContext`, formulários com `@mantine/form`, páginas Login/Registro), rotas protegidas (`RequireAuth`) e logout no layout. Tratamento de loading/erro. Validados typecheck, lints, CORS e integração (registro 201, login token, /users/me 200). |

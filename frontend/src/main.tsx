@@ -9,6 +9,7 @@ import "@mantine/core/styles.css";
 import "@mantine/notifications/styles.css";
 
 import { App } from "./app/App";
+import { AuthProvider } from "./features/auth/context/AuthContext";
 import { queryClient } from "./shared/api/queryClient";
 
 const rootElement = document.getElementById("root");
@@ -22,7 +23,9 @@ ReactDOM.createRoot(rootElement).render(
       <QueryClientProvider client={queryClient}>
         <Notifications />
         <BrowserRouter>
-          <App />
+          <AuthProvider>
+            <App />
+          </AuthProvider>
         </BrowserRouter>
       </QueryClientProvider>
     </MantineProvider>
