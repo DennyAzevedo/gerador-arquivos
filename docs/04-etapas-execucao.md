@@ -13,8 +13,8 @@ Roteiro de fases do projeto. **Este é um documento vivo**: a cada passo/fase co
 
 | Fase | Descrição | Status |
 | ---- | --------- | ------ |
-| 0 | Documentação e fundação | 🟡 Em andamento |
-| 1 | Infraestrutura (Docker Compose + Dockerfiles) | ⬜ Pendente |
+| 0 | Documentação e fundação | ✅ Concluído |
+| 1 | Infraestrutura (Docker Compose + Dockerfiles) | ✅ Concluído |
 | 2 | Backend — fundação (config, DB, domínio, camadas) | ⬜ Pendente |
 | 3 | Backend — autenticação (JWT / fastapi-users) | ⬜ Pendente |
 | 4 | Backend — geração de artigos (OpenAI) e CRUD | ⬜ Pendente |
@@ -27,7 +27,7 @@ Roteiro de fases do projeto. **Este é um documento vivo**: a cada passo/fase co
 
 ---
 
-## Fase 0 — Documentação e fundação 🟡
+## Fase 0 — Documentação e fundação ✅
 
 - [x] Definir stack ([01 — Stack](./01-stack.md))
 - [x] Definir planejamento e arquitetura ([02 — Planejamento](./02-planejamento.md))
@@ -35,14 +35,19 @@ Roteiro de fases do projeto. **Este é um documento vivo**: a cada passo/fase co
 - [x] Criar este roteiro de execução
 - [x] Atualizar o `README.md` da raiz com link para `docs/`
 
-## Fase 1 — Infraestrutura ⬜
+## Fase 1 — Infraestrutura ✅
 
-- [ ] `docker-compose.yml` com serviços `db`, `backend`, `frontend`
-- [ ] `db`: PostgreSQL 16, volume `pgdata`, porta `5432` exposta, healthcheck
-- [ ] `.env.example` com todas as variáveis (sem segredos reais)
-- [ ] Ajustar `.gitignore` (`.env`, artefatos de build, venv, node_modules)
-- [ ] `backend/Dockerfile` e `frontend/Dockerfile`
-- [ ] Validar `docker compose up` subindo os 3 containers
+> **Decisão importante:** o PostgreSQL **não** faz parte do `docker-compose.yml`. Reutilizamos o container `db-postgres` (PostgreSQL 18) já existente no host, publicado em `localhost:5432`. O backend o acessa via `host.docker.internal:5432`. Banco do projeto: **`gerador_artigos`** (usuário `denny`).
+
+- [x] `docker-compose.yml` com serviços `backend` e `frontend` (db é externo)
+- [x] Conectar backend ao Postgres existente via `host.docker.internal` (`extra_hosts: host-gateway`)
+- [x] Criar o banco `gerador_artigos` no container existente
+- [x] `.env.example` com todas as variáveis (sem segredos reais)
+- [x] `.gitignore` já cobre `.env`, `node_modules`, `__pycache__`, `venv` (com `!.env.example`)
+- [x] `backend/Dockerfile` e `frontend/Dockerfile`
+- [x] Validar `docker compose config` (sintaxe OK)
+- [x] Validar conectividade com o Postgres via `host.docker.internal` (`pg_isready` OK)
+- [ ] Build/boot completo de `backend` e `frontend` — depende dos manifestos criados nas Fases 2 e 5
 
 ## Fase 2 — Backend: fundação ⬜
 
@@ -130,3 +135,4 @@ Registre aqui cada avanço relevante (data, fase, resumo).
 | Data | Fase | Resumo |
 | ---- | ---- | ------ |
 | 2026-06-05 | 0 | Criada a documentação inicial em `docs/` (stack, planejamento, regras e etapas). |
+| 2026-06-05 | 1 | Infraestrutura criada: `docker-compose.yml` (backend + frontend), Dockerfiles e `.env.example`. PostgreSQL passou a ser o container existente `db-postgres` (banco `gerador_artigos`), acessado via `host.docker.internal`. Validados `compose config` e conectividade ao banco. |

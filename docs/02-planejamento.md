@@ -141,26 +141,26 @@ Princípios de UX aplicados: hierarquia visual clara, feedback imediato (loading
 
 ## 7. Infraestrutura (Docker Compose)
 
+O PostgreSQL **não** faz parte do Compose: reutilizamos o container `db-postgres` (PostgreSQL 18) já existente no host. O backend o acessa via `host.docker.internal:5432`.
+
 ```yaml
 services:
-  db:        # postgres:16, volume pgdata, porta 5432 exposta, healthcheck pg_isready
-  backend:   # build ./backend, depende de db saudável, porta 8000
+  backend:   # build ./backend, porta 8000, extra_hosts host.docker.internal:host-gateway
   frontend:  # build ./frontend, porta 5173, aponta para backend
-volumes:
-  pgdata:
 ```
 
 ### Variáveis de ambiente (`.env.example`)
 
 ```
-POSTGRES_USER=postgres
-POSTGRES_PASSWORD=postgres
-POSTGRES_DB=gerador
-DATABASE_URL=postgresql+asyncpg://postgres:postgres@db:5432/gerador
+POSTGRES_USER=seu_usuario
+POSTGRES_PASSWORD=sua_senha
+POSTGRES_DB=gerador_artigos
+DATABASE_URL=postgresql+asyncpg://seu_usuario:sua_senha@host.docker.internal:5432/gerador_artigos
 OPENAI_API_KEY=sk-...
 OPENAI_MODEL=gpt-4o-mini
 JWT_SECRET=troque-este-segredo
 CORS_ORIGINS=http://localhost:5173
+VITE_API_URL=http://localhost:8000
 ```
 
 ## 8. Decisões assumidas (reversíveis)

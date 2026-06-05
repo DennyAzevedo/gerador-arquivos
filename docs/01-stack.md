@@ -10,18 +10,19 @@ Documento que registra a stack sugerida para o projeto e a justificativa de cada
 | Backend | Python + **FastAPI** + SQLAlchemy 2.0 (async) + Alembic + Pydantic |
 | Autenticação | JWT (OAuth2 password flow) via `fastapi-users` |
 | IA / Geração | OpenAI SDK (Python) |
-| Banco de dados | PostgreSQL (porta `5432` exposta ao host) |
-| Infraestrutura | Docker Compose (serviços: `frontend`, `backend`, `db`) |
+| Banco de dados | PostgreSQL (container existente no host, `localhost:5432`) |
+| Infraestrutura | Docker Compose (serviços: `frontend`, `backend`) |
 
 ## Diagrama de arquitetura
 
 ```
-┌──────────────┐      ┌──────────────┐      ┌──────────────┐
-│  frontend    │─────►│   backend    │─────►│  postgres    │
-│ React+Vite   │ HTTP │   FastAPI    │ SQL  │  :5432 (host)│
-│ Mantine :5173│◄─────│   :8000      │◄─────│  volume      │
-└──────────────┘      └──────┬───────┘      └──────────────┘
-                             │ HTTPS
+   Docker Compose                              Host
+┌──────────────┐      ┌──────────────┐      ┌──────────────────┐
+│  frontend    │─────►│   backend    │─────►│  db-postgres     │
+│ React+Vite   │ HTTP │   FastAPI    │ SQL  │  PostgreSQL 18   │
+│ Mantine :5173│◄─────│   :8000      │◄─────│  localhost:5432  │
+└──────────────┘      └──────┬───────┘      └──────────────────┘
+                             │ HTTPS         (via host.docker.internal)
                              ▼
                         OpenAI API
 ```
@@ -47,15 +48,16 @@ Documento que registra a stack sugerida para o projeto e a justificativa de cada
 
 ## Banco de dados — PostgreSQL
 
-- Executado em container com volume persistente (`pgdata`).
-- Porta `5432` exposta ao host para inspeção via **DataGrip (JetBrains)** — por isso não há Adminer/pgAdmin no Compose.
+- Reutilizamos o container **`db-postgres`** (PostgreSQL 18) já existente no host, publicado em `localhost:5432` — não criamos um serviço de banco no Compose.
+- Banco do projeto: **`gerador_artigos`** (usuário `denny`).
+- O backend o acessa via `host.docker.internal:5432` (mapeado com `extra_hosts: host-gateway`).
+- Inspeção via **DataGrip (JetBrains)** direto em `localhost:5432` — por isso não há Adminer/pgAdmin.
 
 ## Infraestrutura — Docker Compose
 
-Três serviços:
+Dois serviços (o PostgreSQL é externo ao Compose):
 
-- `db`: PostgreSQL 16 com `healthcheck` (`pg_isready`).
-- `backend`: FastAPI; sobe somente após o banco estar saudável.
+- `backend`: FastAPI; conecta ao Postgres do host via `host.docker.internal`.
 - `frontend`: React + Vite; aponta para o backend.
 
 Variáveis sensíveis ficam em `.env` (não versionado), com um `.env.example` versionado como referência.
@@ -63,6 +65,7 @@ Variáveis sensíveis ficam em `.env` (não versionado), com um `.env.example` v
 ## Decisões registradas
 
 - **UI**: Mantine (confirmado pelo usuário).
+- **Banco**: reutilizar o container existente `db-postgres` (PostgreSQL 18) no host, em vez de um serviço novo no Compose. Banco do projeto: `gerador_artigos`.
 - **Visualização do banco**: nenhuma ferramenta no Compose; uso externo do DataGrip.
 - **Modelo OpenAI**: configurável por variável de ambiente (padrão sugerido: `gpt-4o-mini`).
 - **Publicação no WordPress**: prevista como etapa futura (roadmap), fora do primeiro ciclo.
