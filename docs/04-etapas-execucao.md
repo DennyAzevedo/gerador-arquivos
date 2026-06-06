@@ -22,7 +22,7 @@ Roteiro de fases do projeto. **Este é um documento vivo**: a cada passo/fase co
 | 6 | Frontend — autenticação (login/registro) | ✅ Concluído |
 | 7 | Frontend — geração e gestão de artigos | ✅ Concluído |
 | 8 | Integração ponta a ponta e ajustes de UX | ✅ Concluído |
-| 9 | Testes automatizados | ⬜ Pendente |
+| 9 | Testes automatizados | ✅ Concluído |
 | 10 | Documentação final e revisão | ⬜ Pendente |
 
 ---
@@ -137,33 +137,49 @@ Roteiro de fases do projeto. **Este é um documento vivo**: a cada passo/fase co
 
 > **Geração real:** continua dependendo de `OPENAI_API_KEY` válida no `.env` (placeholder retorna `502` tratado). **Validação automatizada:** FE `200`, backend ready, E2E CRUD `201/200/200/204`, token inválido `401`, generate `502`. Conferir fluxo visual no navegador em `http://localhost:5173` após `docker compose up`.
 
-## Fase 9 — Testes automatizados ⬜
-
-> **Objetivo:** cobrir domínio, casos de uso, repositórios/adapters e endpoints críticos, seguindo as regras (testes em pasta `tests/` separada, espelhando a estrutura da fonte).
+## Fase 9 — Testes automatizados ✅
 
 **Backend (pytest):**
-- [ ] Configurar `pytest` + `pytest-asyncio` + dependências de teste no backend
-- [ ] `tests/unit/domain/` — entidades, regras de propriedade (`ArticleNotFoundError`, status)
-- [ ] `tests/unit/application/` — casos de uso (create/update/delete/get/list) com repositório fake
-- [ ] `tests/unit/application/` — `GenerateArticleUseCase` com gerador fake
-- [ ] `tests/integration/infrastructure/` — repositórios SQLAlchemy (banco de teste ou container)
-- [ ] `tests/api/` — auth (register/login/me), articles CRUD, `/health`, erros 401/404/502
+- [x] Configurar `pytest` + `pytest-asyncio` + `httpx` (`requirements-dev.txt`)
+- [x] `tests/unit/domain/` — entidades e `ArticleNotFoundError`
+- [x] `tests/unit/application/` — casos de uso com repositório/gerador fake
+- [x] `tests/integration/infrastructure/` — `SqlAlchemyArticleRepository` (Postgres `gerador_artigos_test`)
+- [x] `tests/api/` — auth, articles CRUD, `/health`, generate (override/502)
 
 **Frontend (Vitest + Testing Library):**
-- [ ] Configurar Vitest + `@testing-library/react` + jsdom
-- [ ] `tests/shared/lib/` — `getApiErrorMessage`, `authStorage`
-- [ ] `tests/features/auth/` — formulários (validação), `RequireAuth`/`RequireGuest`
-- [ ] `tests/features/articles/` — hooks (mock de service), componentes (estados loading/vazio/erro)
+- [x] Configurar Vitest + `@testing-library/react` + jsdom
+- [x] `tests/shared/lib/` — `getApiErrorMessage`, `authStorage`
+- [x] `tests/features/auth/` — `LoginForm`, `RequireAuth`, `RequireGuest`
+- [x] `tests/features/articles/` — `DashboardPage` (loading/vazio/erro)
 
 **Critérios de aceite:**
-- [ ] Happy path + edge cases + falhas esperadas
-- [ ] Comando documentado para rodar testes (backend e frontend)
+- [x] Happy path + edge cases + falhas esperadas
+- [x] Comandos documentados abaixo
+
+### Como executar os testes
+
+**Backend** (requer Postgres com banco `gerador_artigos_test`):
+
+```bash
+docker compose run --rm \
+  -e DATABASE_URL="postgresql+asyncpg://USER:SENHA@host.docker.internal:5432/gerador_artigos_test" \
+  backend sh -c "pip install -r requirements-dev.txt && pytest"
+```
+
+**Frontend:**
+
+```bash
+docker compose run --rm --no-deps frontend sh -c "npm install && npm run test"
+```
+
+> **Resultado:** backend **20 passed**; frontend **13 passed** (6 arquivos).
 
 ## Fase 10 — Documentação final ⬜
 
-- [ ] Atualizar `README.md` com instruções de build e execução
+- [ ] Atualizar `README.md` com instruções completas (build, execução, testes, variáveis de ambiente)
 - [ ] Revisar todos os documentos de `docs/`
-- [ ] Registrar próximos passos (ex.: publicação no WordPress)
+- [ ] Registrar roadmap futuro (publicação WordPress, CI/CD opcional)
+- [ ] Validar `.env.example` alinhado ao estado atual do projeto
 
 ---
 
@@ -182,3 +198,4 @@ Registre aqui cada avanço relevante (data, fase, resumo).
 | 2026-06-05 | 6 | Frontend auth: feature `auth` completa (types, service, hooks de mutation, `AuthContext`, formulários com `@mantine/form`, páginas Login/Registro), rotas protegidas (`RequireAuth`) e logout no layout. Tratamento de loading/erro. Validados typecheck, lints, CORS e integração (registro 201, login token, /users/me 200). |
 | 2026-06-06 | 7 | Frontend artigos: feature `articles` (service, hooks query/mutation, `ArticleCard`, `ArticleForm`, `GenerateArticleForm`), Dashboard com lista/ações, geração com preview editável e página de edição. Notificações e estados loading/vazio/erro. `HomePage` removida. Validados typecheck, lints e CRUD integrado (201/200/200/204/404). |
 | 2026-06-06 | 8 | Integração E2E: stack completa validada; interceptor 401 global, `RequireGuest`, return URL no login, logout com redirect, erros amigáveis ampliados, UX responsiva no layout/auth. E2E API: register→CRUD→delete OK; 401 e 502 tratados. Fase 9 detalhada no planejamento. |
+| 2026-06-06 | 9 | Testes automatizados: backend pytest (20 testes — unit/application/domain, integration repositório, API auth/articles/health) com banco `gerador_artigos_test`; frontend Vitest (13 testes — lib, auth, dashboard). Comandos documentados em `docs/04`. |
