@@ -20,7 +20,7 @@ Roteiro de fases do projeto. **Este é um documento vivo**: a cada passo/fase co
 | 4 | Backend — geração de artigos (OpenAI) e CRUD | ✅ Concluído |
 | 5 | Frontend — fundação (Vite + Mantine + Router) | ✅ Concluído |
 | 6 | Frontend — autenticação (login/registro) | ✅ Concluído |
-| 7 | Frontend — geração e gestão de artigos | ⬜ Pendente |
+| 7 | Frontend — geração e gestão de artigos | ✅ Concluído |
 | 8 | Integração ponta a ponta e ajustes de UX | ⬜ Pendente |
 | 9 | Testes automatizados | ⬜ Pendente |
 | 10 | Documentação final e revisão | ⬜ Pendente |
@@ -112,19 +112,35 @@ Roteiro de fases do projeto. **Este é um documento vivo**: a cada passo/fase co
 
 > **Fluxo:** `/login` e `/register` públicos; demais rotas sob `RequireAuth` (redireciona p/ `/login`). Token em `localStorage`, injetado pelo interceptor do axios. Logout no header do `AppShell`. **Validação:** typecheck strict OK, lints OK, CORS p/ `localhost:5173` OK, registro (201), login (token) e `/users/me` (200) confirmados com os mesmos contratos do `authService`. (A interação visual deve ser conferida no navegador.)
 
-## Fase 7 — Frontend: artigos ⬜
+## Fase 7 — Frontend: artigos ✅
 
-- [ ] Feature `articles` (domain, services, hooks, components, pages)
-- [ ] Dashboard com lista de artigos (cards, status, ações)
-- [ ] Tela de geração (form → preview editável → salvar)
-- [ ] Feedback via `@mantine/notifications`
-- [ ] Estados de loading, vazio e erro
+- [x] Feature `articles`: `domain/types`, `services/articleService`, hooks (queries + mutations), components e pages
+- [x] Dashboard com lista de artigos (`ArticleCard` com status, editar/excluir + modal de confirmação)
+- [x] Tela de geração (`GenerateArticleForm` → preview editável `ArticleForm` → salvar)
+- [x] Página de edição (`EditArticlePage`) com `useArticle` + `useUpdateArticle`
+- [x] Feedback via `@mantine/notifications` (salvar, atualizar, excluir, erros)
+- [x] Estados de loading, vazio (CTA) e erro tratados
+
+> **Rotas:** `/` (Dashboard), `/articles/generate`, `/articles/:articleId/edit` (todas sob `RequireAuth`). `HomePage` placeholder removida.
+>
+> **Validação:** typecheck strict OK, lints OK; CRUD validado com os contratos do frontend — CREATE `201`, LIST `200`, GET `200`, UPDATE `200`, DELETE `204`, GET pós-delete `404`. A geração real depende de `OPENAI_API_KEY` válida (com placeholder, o backend retorna `502` tratado). Interação visual a conferir no navegador.
 
 ## Fase 8 — Integração ponta a ponta ⬜
 
-- [ ] Fluxo completo: registrar → logar → gerar → editar → salvar → listar
-- [ ] Ajustes de UX e responsividade
-- [ ] Tratamento consistente de erros entre front e back
+> **Pré-requisito:** definir uma `OPENAI_API_KEY` válida no `.env` para exercitar a geração real (sem ela, `/articles/generate` retorna `502` tratado).
+
+- [ ] Subir a stack completa (`docker compose up`) com backend + frontend + Postgres existente
+- [ ] Fluxo completo no navegador: registrar → logar → gerar → revisar/editar → salvar → listar → editar → excluir
+- [ ] Validar redirecionamentos de auth (acesso a rota protegida sem token → `/login`; logout limpa sessão)
+- [ ] Conferir expiração/erros 401 no front (token inválido → retorno ao login)
+- [ ] Ajustes de UX e responsividade (layout em telas pequenas, mensagens, foco)
+- [ ] Tratamento consistente de erros entre front e back (mensagens amigáveis para 401/404/502/validação)
+- [ ] (Opcional) Interceptor de resposta no axios para 401 global (logout automático)
+- [ ] Registrar evidências (prints/observações) no histórico
+
+**Pontos de atenção identificados nas fases anteriores:**
+- O front mapeia erros conhecidos (`LOGIN_BAD_CREDENTIALS`, `REGISTER_USER_ALREADY_EXISTS`); avaliar cobrir `REGISTER_INVALID_PASSWORD` (detalhe em objeto) e erros de rede.
+- Geração só funciona com chave OpenAI válida; documentar isso no fluxo de teste.
 
 ## Fase 9 — Testes automatizados ⬜
 
@@ -155,3 +171,4 @@ Registre aqui cada avanço relevante (data, fase, resumo).
 | 2026-06-05 | 4 | Artigos (CQRS + OpenAI): porta `ArticleGenerator` + adapter OpenAI, `ArticleRepository` (port + impl + mapper), casos de uso de geração e CRUD com checagem de propriedade, DTOs e endpoints `/articles/*` e `/articles/generate`. Handlers de erro (404/502). CRUD validado ponta a ponta; `generate` com erro tratado (502). |
 | 2026-06-05 | 5 | Frontend fundacional: scaffold Vite + React 19 + TS strict, Mantine 9, TanStack Query 5, React Router 7 e Axios. Providers em `main.tsx`, layout `AppShell`, `HomePage`, cliente HTTP com interceptor de token e `authStorage`. Container validado (Vite servindo, typecheck e lints OK). |
 | 2026-06-05 | 6 | Frontend auth: feature `auth` completa (types, service, hooks de mutation, `AuthContext`, formulários com `@mantine/form`, páginas Login/Registro), rotas protegidas (`RequireAuth`) e logout no layout. Tratamento de loading/erro. Validados typecheck, lints, CORS e integração (registro 201, login token, /users/me 200). |
+| 2026-06-06 | 7 | Frontend artigos: feature `articles` (service, hooks query/mutation, `ArticleCard`, `ArticleForm`, `GenerateArticleForm`), Dashboard com lista/ações, geração com preview editável e página de edição. Notificações e estados loading/vazio/erro. `HomePage` removida. Validados typecheck, lints e CRUD integrado (201/200/200/204/404). |
