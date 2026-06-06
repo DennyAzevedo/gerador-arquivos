@@ -105,6 +105,8 @@ Crie o banco do projeto no PostgreSQL (se ainda não existir):
 psql -U seu_usuario -c "CREATE DATABASE gerador_artigos;"
 ```
 
+**DataGrip:** conecte em `localhost:5432` com o usuário do `.env`, mas selecione o banco **`gerador_artigos`** (não `denny` nem `postgres` — esses bancos existem por padrão, porém ficam vazios). As tabelas ficam em `schemas → public → tables` (`users`, `articles`, `alembic_version`).
+
 ### 3. Migrações
 
 ```bash

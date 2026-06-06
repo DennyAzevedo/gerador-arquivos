@@ -6,7 +6,9 @@ import { LoginForm } from "../components/LoginForm";
 export function LoginPage() {
   const navigate = useNavigate();
   const location = useLocation();
-  const redirectTo = (location.state as { from?: string } | null)?.from ?? "/";
+  const locationState = location.state as { from?: string; email?: string } | null;
+  const redirectTo = locationState?.from ?? "/";
+  const initialEmail = locationState?.email ?? "";
 
   return (
     <Center mih="100vh" p="md">
@@ -15,7 +17,10 @@ export function LoginPage() {
           <Title order={2} ta="center">
             Entrar
           </Title>
-          <LoginForm onSuccess={() => navigate(redirectTo, { replace: true })} />
+          <LoginForm
+            initialEmail={initialEmail}
+            onSuccess={() => navigate(redirectTo, { replace: true })}
+          />
           <Text size="sm" ta="center" c="dimmed">
             Não tem conta?{" "}
             <Anchor component={Link} to="/register">

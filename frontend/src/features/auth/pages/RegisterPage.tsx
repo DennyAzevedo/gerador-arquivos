@@ -3,17 +3,35 @@ import { notifications } from "@mantine/notifications";
 import { Link, useNavigate } from "react-router-dom";
 
 import { RegisterForm } from "../components/RegisterForm";
+import type { RegisterData } from "../domain/types";
+import { useLogin } from "../hooks/useLogin";
 
 export function RegisterPage() {
   const navigate = useNavigate();
+  const loginMutation = useLogin();
 
-  function handleSuccess(): void {
-    notifications.show({
-      title: "Cadastro realizado",
-      message: "Sua conta foi criada. Faça login para continuar.",
-      color: "green",
-    });
-    navigate("/login");
+  function handleSuccess(values: RegisterData): void {
+    loginMutation.mutate(
+      { email: values.email, password: values.password },
+      {
+        onSuccess: () => {
+          notifications.show({
+            title: "Conta criada",
+            message: "Bem-vindo! Você já está autenticado.",
+            color: "green",
+          });
+          navigate("/", { replace: true });
+        },
+        onError: () => {
+          notifications.show({
+            title: "Cadastro realizado",
+            message: "Sua conta foi criada. Faça login para continuar.",
+            color: "green",
+          });
+          navigate("/login", { state: { email: values.email } });
+        },
+      },
+    );
   }
 
   return (

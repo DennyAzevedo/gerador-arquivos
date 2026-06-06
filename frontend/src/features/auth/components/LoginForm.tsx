@@ -6,13 +6,14 @@ import type { Credentials } from "../domain/types";
 import { useLogin } from "../hooks/useLogin";
 
 interface LoginFormProps {
+  initialEmail?: string;
   onSuccess: () => void;
 }
 
-export function LoginForm({ onSuccess }: LoginFormProps) {
+export function LoginForm({ initialEmail = "", onSuccess }: LoginFormProps) {
   const loginMutation = useLogin();
   const form = useForm<Credentials>({
-    initialValues: { email: "", password: "" },
+    initialValues: { email: initialEmail, password: "" },
     validate: {
       email: (value) => (/^\S+@\S+$/.test(value) ? null : "E-mail inválido"),
       password: (value) => (value.length > 0 ? null : "Informe a senha"),

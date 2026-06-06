@@ -6,7 +6,7 @@ import type { RegisterData } from "../domain/types";
 import { useRegister } from "../hooks/useRegister";
 
 interface RegisterFormProps {
-  onSuccess: () => void;
+  onSuccess: (values: RegisterData) => void;
 }
 
 const MIN_PASSWORD_LENGTH = 8;
@@ -25,7 +25,7 @@ export function RegisterForm({ onSuccess }: RegisterFormProps) {
   });
 
   function handleSubmit(values: RegisterData): void {
-    registerMutation.mutate(values, { onSuccess });
+    registerMutation.mutate(values, { onSuccess: () => onSuccess(values) });
   }
 
   return (
