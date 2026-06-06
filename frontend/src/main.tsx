@@ -10,6 +10,7 @@ import "@mantine/notifications/styles.css";
 
 import { App } from "./app/App";
 import { AuthProvider } from "./features/auth/context/AuthContext";
+import { UnauthorizedListener } from "./features/auth/components/UnauthorizedListener";
 import { queryClient } from "./shared/api/queryClient";
 
 const rootElement = document.getElementById("root");
@@ -24,6 +25,7 @@ ReactDOM.createRoot(rootElement).render(
         <Notifications />
         <BrowserRouter>
           <AuthProvider>
+            <UnauthorizedListener />
             <App />
           </AuthProvider>
         </BrowserRouter>

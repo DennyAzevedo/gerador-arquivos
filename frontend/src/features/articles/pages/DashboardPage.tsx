@@ -2,13 +2,14 @@ import { Alert, Button, Center, Group, Loader, SimpleGrid, Stack, Text, Title } 
 import { notifications } from "@mantine/notifications";
 import { useNavigate } from "react-router-dom";
 
+import { getApiErrorMessage } from "../../../shared/lib/apiError";
 import { ArticleCard } from "../components/ArticleCard";
 import { useArticles } from "../hooks/useArticles";
 import { useDeleteArticle } from "../hooks/useDeleteArticle";
 
 export function DashboardPage() {
   const navigate = useNavigate();
-  const { data: articles, isLoading, isError } = useArticles();
+  const { data: articles, isLoading, isError, error } = useArticles();
   const deleteMutation = useDeleteArticle();
 
   function handleDelete(id: string): void {
@@ -16,15 +17,18 @@ export function DashboardPage() {
       onSuccess: () => {
         notifications.show({ message: "Artigo excluído.", color: "green" });
       },
-      onError: () => {
-        notifications.show({ message: "Não foi possível excluir o artigo.", color: "red" });
+      onError: (error) => {
+        notifications.show({
+          message: getApiErrorMessage(error, "Não foi possível excluir o artigo."),
+          color: "red",
+        });
       },
     });
   }
 
   return (
     <Stack>
-      <Group justify="space-between">
+      <Group justify="space-between" align="flex-start" wrap="wrap" gap="sm">
         <Title order={2}>Meus artigos</Title>
         <Button onClick={() => navigate("/articles/generate")}>Gerar artigo</Button>
       </Group>
@@ -37,7 +41,7 @@ export function DashboardPage() {
 
       {isError && (
         <Alert color="red" title="Erro ao carregar">
-          Não foi possível carregar seus artigos. Tente novamente mais tarde.
+          {getApiErrorMessage(error, "Não foi possível carregar seus artigos. Tente novamente mais tarde.")}
         </Alert>
       )}
 

@@ -1,11 +1,10 @@
 import { Center, Loader } from "@mantine/core";
-import { Navigate, Outlet, useLocation } from "react-router-dom";
+import { Navigate, Outlet } from "react-router-dom";
 
 import { useAuth } from "../context/AuthContext";
 
-export function RequireAuth() {
+export function RequireGuest() {
   const { status } = useAuth();
-  const location = useLocation();
 
   if (status === "loading") {
     return (
@@ -15,8 +14,8 @@ export function RequireAuth() {
     );
   }
 
-  if (status === "unauthenticated") {
-    return <Navigate to="/login" state={{ from: location.pathname }} replace />;
+  if (status === "authenticated") {
+    return <Navigate to="/" replace />;
   }
 
   return <Outlet />;

@@ -1,6 +1,7 @@
 import { Route, Routes } from "react-router-dom";
 
 import { RequireAuth } from "../features/auth/components/RequireAuth";
+import { RequireGuest } from "../features/auth/components/RequireGuest";
 import { LoginPage } from "../features/auth/pages/LoginPage";
 import { RegisterPage } from "../features/auth/pages/RegisterPage";
 import { DashboardPage } from "../features/articles/pages/DashboardPage";
@@ -11,8 +12,10 @@ import { MainLayout } from "./layout/MainLayout";
 export function App() {
   return (
     <Routes>
-      <Route path="/login" element={<LoginPage />} />
-      <Route path="/register" element={<RegisterPage />} />
+      <Route element={<RequireGuest />}>
+        <Route path="/login" element={<LoginPage />} />
+        <Route path="/register" element={<RegisterPage />} />
+      </Route>
       <Route element={<RequireAuth />}>
         <Route element={<MainLayout />}>
           <Route path="/" element={<DashboardPage />} />

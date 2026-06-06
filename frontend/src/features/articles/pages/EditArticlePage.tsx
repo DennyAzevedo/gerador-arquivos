@@ -2,6 +2,7 @@ import { Alert, Card, Center, Loader, Stack, Title } from "@mantine/core";
 import { notifications } from "@mantine/notifications";
 import { useNavigate, useParams } from "react-router-dom";
 
+import { getApiErrorMessage } from "../../../shared/lib/apiError";
 import { ArticleForm, type ArticleFormValues } from "../components/ArticleForm";
 import { useArticle } from "../hooks/useArticle";
 import { useUpdateArticle } from "../hooks/useUpdateArticle";
@@ -9,7 +10,7 @@ import { useUpdateArticle } from "../hooks/useUpdateArticle";
 export function EditArticlePage() {
   const navigate = useNavigate();
   const { articleId } = useParams<{ articleId: string }>();
-  const { data: article, isLoading, isError } = useArticle(articleId);
+  const { data: article, isLoading, isError, error } = useArticle(articleId);
   const updateMutation = useUpdateArticle();
 
   function handleSave(values: ArticleFormValues): void {
@@ -30,8 +31,11 @@ export function EditArticlePage() {
           notifications.show({ title: "Alterações salvas", message: "Artigo atualizado.", color: "green" });
           navigate("/");
         },
-        onError: () => {
-          notifications.show({ message: "Não foi possível salvar as alterações.", color: "red" });
+        onError: (mutationError) => {
+          notifications.show({
+            message: getApiErrorMessage(mutationError, "Não foi possível salvar as alterações."),
+            color: "red",
+          });
         },
       },
     );
@@ -49,7 +53,7 @@ export function EditArticlePage() {
 
       {isError && (
         <Alert color="red" title="Erro ao carregar">
-          Não foi possível carregar o artigo.
+          {getApiErrorMessage(error, "Não foi possível carregar o artigo.")}
         </Alert>
       )}
 

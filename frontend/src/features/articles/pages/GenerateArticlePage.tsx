@@ -3,6 +3,7 @@ import { notifications } from "@mantine/notifications";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 
+import { getApiErrorMessage } from "../../../shared/lib/apiError";
 import { ArticleForm, type ArticleFormValues } from "../components/ArticleForm";
 import { GenerateArticleForm } from "../components/GenerateArticleForm";
 import type { GeneratedArticle, GenerateArticleInput } from "../domain/types";
@@ -37,8 +38,11 @@ export function GenerateArticlePage() {
           notifications.show({ title: "Artigo salvo", message: "Seu artigo foi salvo.", color: "green" });
           navigate("/");
         },
-        onError: () => {
-          notifications.show({ message: "Não foi possível salvar o artigo.", color: "red" });
+        onError: (mutationError) => {
+          notifications.show({
+            message: getApiErrorMessage(mutationError, "Não foi possível salvar o artigo."),
+            color: "red",
+          });
         },
       },
     );

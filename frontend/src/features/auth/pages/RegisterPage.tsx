@@ -18,7 +18,7 @@ export function RegisterPage() {
 
   return (
     <Center mih="100vh" p="md">
-      <Card withBorder w={400} padding="xl" radius="md" shadow="sm">
+      <Card withBorder w={{ base: "100%", sm: 400 }} maw={400} padding="xl" radius="md" shadow="sm">
         <Stack>
           <Title order={2} ta="center">
             Criar conta

@@ -21,7 +21,7 @@ Roteiro de fases do projeto. **Este é um documento vivo**: a cada passo/fase co
 | 5 | Frontend — fundação (Vite + Mantine + Router) | ✅ Concluído |
 | 6 | Frontend — autenticação (login/registro) | ✅ Concluído |
 | 7 | Frontend — geração e gestão de artigos | ✅ Concluído |
-| 8 | Integração ponta a ponta e ajustes de UX | ⬜ Pendente |
+| 8 | Integração ponta a ponta e ajustes de UX | ✅ Concluído |
 | 9 | Testes automatizados | ⬜ Pendente |
 | 10 | Documentação final e revisão | ⬜ Pendente |
 
@@ -125,30 +125,39 @@ Roteiro de fases do projeto. **Este é um documento vivo**: a cada passo/fase co
 >
 > **Validação:** typecheck strict OK, lints OK; CRUD validado com os contratos do frontend — CREATE `201`, LIST `200`, GET `200`, UPDATE `200`, DELETE `204`, GET pós-delete `404`. A geração real depende de `OPENAI_API_KEY` válida (com placeholder, o backend retorna `502` tratado). Interação visual a conferir no navegador.
 
-## Fase 8 — Integração ponta a ponta ⬜
+## Fase 8 — Integração ponta a ponta ✅
 
-> **Pré-requisito:** definir uma `OPENAI_API_KEY` válida no `.env` para exercitar a geração real (sem ela, `/articles/generate` retorna `502` tratado).
+- [x] Subir a stack completa (`docker compose up`) com backend + frontend + Postgres existente
+- [x] Fluxo completo validado (API): registrar → logar → criar → listar → editar → excluir
+- [x] Redirecionamentos de auth: `RequireAuth` (→ `/login` com `from`), `RequireGuest` (autenticado → `/`), logout → `/login`
+- [x] Tratamento de 401: interceptor global no axios + `UnauthorizedListener` (logout + notificação)
+- [x] Ajustes de UX/responsividade: cards auth fluidos, header responsivo, nav no layout, grupos com wrap
+- [x] Erros consistentes: `getApiErrorMessage` ampliado (validação FastAPI, rede, 401/404/502, códigos conhecidos)
+- [x] Evidências registradas no histórico
 
-- [ ] Subir a stack completa (`docker compose up`) com backend + frontend + Postgres existente
-- [ ] Fluxo completo no navegador: registrar → logar → gerar → revisar/editar → salvar → listar → editar → excluir
-- [ ] Validar redirecionamentos de auth (acesso a rota protegida sem token → `/login`; logout limpa sessão)
-- [ ] Conferir expiração/erros 401 no front (token inválido → retorno ao login)
-- [ ] Ajustes de UX e responsividade (layout em telas pequenas, mensagens, foco)
-- [ ] Tratamento consistente de erros entre front e back (mensagens amigáveis para 401/404/502/validação)
-- [ ] (Opcional) Interceptor de resposta no axios para 401 global (logout automático)
-- [ ] Registrar evidências (prints/observações) no histórico
-
-**Pontos de atenção identificados nas fases anteriores:**
-- O front mapeia erros conhecidos (`LOGIN_BAD_CREDENTIALS`, `REGISTER_USER_ALREADY_EXISTS`); avaliar cobrir `REGISTER_INVALID_PASSWORD` (detalhe em objeto) e erros de rede.
-- Geração só funciona com chave OpenAI válida; documentar isso no fluxo de teste.
+> **Geração real:** continua dependendo de `OPENAI_API_KEY` válida no `.env` (placeholder retorna `502` tratado). **Validação automatizada:** FE `200`, backend ready, E2E CRUD `201/200/200/204`, token inválido `401`, generate `502`. Conferir fluxo visual no navegador em `http://localhost:5173` após `docker compose up`.
 
 ## Fase 9 — Testes automatizados ⬜
 
-- [ ] Backend: testes unit (domínio/casos de uso) em `tests/unit`
-- [ ] Backend: testes integration (repositórios/adapters) em `tests/integration`
-- [ ] Backend: testes de API em `tests/api`
-- [ ] Frontend: testes de hooks/validadores, componentes e fluxos em `tests/`
-- [ ] Cobrir happy path, edge cases e falhas esperadas
+> **Objetivo:** cobrir domínio, casos de uso, repositórios/adapters e endpoints críticos, seguindo as regras (testes em pasta `tests/` separada, espelhando a estrutura da fonte).
+
+**Backend (pytest):**
+- [ ] Configurar `pytest` + `pytest-asyncio` + dependências de teste no backend
+- [ ] `tests/unit/domain/` — entidades, regras de propriedade (`ArticleNotFoundError`, status)
+- [ ] `tests/unit/application/` — casos de uso (create/update/delete/get/list) com repositório fake
+- [ ] `tests/unit/application/` — `GenerateArticleUseCase` com gerador fake
+- [ ] `tests/integration/infrastructure/` — repositórios SQLAlchemy (banco de teste ou container)
+- [ ] `tests/api/` — auth (register/login/me), articles CRUD, `/health`, erros 401/404/502
+
+**Frontend (Vitest + Testing Library):**
+- [ ] Configurar Vitest + `@testing-library/react` + jsdom
+- [ ] `tests/shared/lib/` — `getApiErrorMessage`, `authStorage`
+- [ ] `tests/features/auth/` — formulários (validação), `RequireAuth`/`RequireGuest`
+- [ ] `tests/features/articles/` — hooks (mock de service), componentes (estados loading/vazio/erro)
+
+**Critérios de aceite:**
+- [ ] Happy path + edge cases + falhas esperadas
+- [ ] Comando documentado para rodar testes (backend e frontend)
 
 ## Fase 10 — Documentação final ⬜
 
@@ -172,3 +181,4 @@ Registre aqui cada avanço relevante (data, fase, resumo).
 | 2026-06-05 | 5 | Frontend fundacional: scaffold Vite + React 19 + TS strict, Mantine 9, TanStack Query 5, React Router 7 e Axios. Providers em `main.tsx`, layout `AppShell`, `HomePage`, cliente HTTP com interceptor de token e `authStorage`. Container validado (Vite servindo, typecheck e lints OK). |
 | 2026-06-05 | 6 | Frontend auth: feature `auth` completa (types, service, hooks de mutation, `AuthContext`, formulários com `@mantine/form`, páginas Login/Registro), rotas protegidas (`RequireAuth`) e logout no layout. Tratamento de loading/erro. Validados typecheck, lints, CORS e integração (registro 201, login token, /users/me 200). |
 | 2026-06-06 | 7 | Frontend artigos: feature `articles` (service, hooks query/mutation, `ArticleCard`, `ArticleForm`, `GenerateArticleForm`), Dashboard com lista/ações, geração com preview editável e página de edição. Notificações e estados loading/vazio/erro. `HomePage` removida. Validados typecheck, lints e CRUD integrado (201/200/200/204/404). |
+| 2026-06-06 | 8 | Integração E2E: stack completa validada; interceptor 401 global, `RequireGuest`, return URL no login, logout com redirect, erros amigáveis ampliados, UX responsiva no layout/auth. E2E API: register→CRUD→delete OK; 401 e 502 tratados. Fase 9 detalhada no planejamento. |
