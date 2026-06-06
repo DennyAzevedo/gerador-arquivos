@@ -70,6 +70,15 @@ Variáveis sensíveis ficam em `.env` (não versionado), com um `.env.example` v
 - **Modelo Gemini**: configurável por variável de ambiente (padrão sugerido: `gemini-2.0-flash`).
 - **Publicação no WordPress**: prevista como etapa futura (roadmap), fora do primeiro ciclo.
 
+## WordPress — publicação automática
+
+- Porta `WordPressPublisher` na camada application; adapters em `infrastructure/wordpress`.
+- **`MockWordPressPublisher`** (padrão): simula envio e retorna URL/mensagem de sucesso — não exige blog montado.
+- **`RestWordPressPublisher`**: publicação real via `POST /wp-json/wp/v2/posts` quando `WORDPRESS_MOCK=false`.
+- Variáveis: `WORDPRESS_MOCK`, `WORDPRESS_URL`, `WORDPRESS_USERNAME`, `WORDPRESS_APP_PASSWORD`.
+- Endpoint: `POST /articles/{id}/publish-wordpress`.
+- Chave de aplicativo WordPress: Usuários → Perfil → Senhas de aplicativo.
+
 ## Migração OpenAI → Gemini
 
 O projeto utilizava inicialmente a OpenAI (`infrastructure/openai`). A geração de artigos foi migrada para a **API Gemini** do Google:

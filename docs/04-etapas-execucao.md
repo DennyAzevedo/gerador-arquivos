@@ -202,4 +202,4 @@ Registre aqui cada avanço relevante (data, fase, resumo).
 | 2026-06-06 | 8 | Integração E2E: stack completa validada; interceptor 401 global, `RequireGuest`, return URL no login, logout com redirect, erros amigáveis ampliados, UX responsiva no layout/auth. E2E API: register→CRUD→delete OK; 401 e 502 tratados. Fase 9 detalhada no planejamento. |
 | 2026-06-06 | 9 | Testes automatizados: backend pytest (22 testes — unit/application/domain, integration repositório, API auth/articles/health) com banco `gerador_artigos_test`; frontend Vitest (13 testes — lib, auth, dashboard). Comandos documentados em `docs/04`. |
 | 2026-06-06 | 10 | Documentação final: `README.md` reescrito (setup, execução, testes, segurança, roadmap); `.env.example` revisado; Fase 10 concluída. Projeto MVP entregue. |
-| 2026-06-06 | — | Migração de provedor de IA: OpenAI → Gemini. Adapter em `infrastructure/gemini`, variáveis `GEMINI_API_KEY`/`GEMINI_MODEL`, dependência `google-genai`. Documentação atualizada. |
+| 2026-06-06 | — | Integração WordPress mockada: porta `WordPressPublisher`, adapters mock/REST, endpoint `POST /articles/{id}/publish-wordpress`, botão na UI, variáveis no `.env`. |

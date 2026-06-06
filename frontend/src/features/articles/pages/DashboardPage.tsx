@@ -6,11 +6,13 @@ import { getApiErrorMessage } from "../../../shared/lib/apiError";
 import { ArticleCard } from "../components/ArticleCard";
 import { useArticles } from "../hooks/useArticles";
 import { useDeleteArticle } from "../hooks/useDeleteArticle";
+import { usePublishToWordPress } from "../hooks/usePublishToWordPress";
 
 export function DashboardPage() {
   const navigate = useNavigate();
   const { data: articles, isLoading, isError, error } = useArticles();
   const deleteMutation = useDeleteArticle();
+  const publishMutation = usePublishToWordPress();
 
   function handleDelete(id: string): void {
     deleteMutation.mutate(id, {
@@ -20,6 +22,25 @@ export function DashboardPage() {
       onError: (error) => {
         notifications.show({
           message: getApiErrorMessage(error, "Não foi possível excluir o artigo."),
+          color: "red",
+        });
+      },
+    });
+  }
+
+  function handlePublishWordPress(id: string): void {
+    publishMutation.mutate(id, {
+      onSuccess: (result) => {
+        notifications.show({
+          title: result.mocked ? "Envio simulado" : "Publicado no WordPress",
+          message: result.message,
+          color: "green",
+        });
+      },
+      onError: (publishError) => {
+        notifications.show({
+          title: "Falha na publicação",
+          message: getApiErrorMessage(publishError, "Não foi possível publicar no WordPress."),
           color: "red",
         });
       },
@@ -64,6 +85,8 @@ export function DashboardPage() {
               article={article}
               onEdit={(id) => navigate(`/articles/${id}/edit`)}
               onDelete={handleDelete}
+              onPublishWordPress={handlePublishWordPress}
+              isPublishing={publishMutation.isPending && publishMutation.variables === article.id}
             />
           ))}
         </SimpleGrid>

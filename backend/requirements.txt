@@ -7,3 +7,4 @@ pydantic>=2.0
 pydantic-settings
 fastapi-users[sqlalchemy]
 google-genai
+httpx

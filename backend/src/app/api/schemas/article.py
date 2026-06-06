@@ -17,6 +17,13 @@ class GeneratedArticleResponse(BaseModel):
     content: str
 
 
+class WordPressPublishResponse(BaseModel):
+    post_id: str
+    post_url: str
+    mocked: bool
+    message: str
+
+
 class ArticleCreateRequest(BaseModel):
     title: str = Field(min_length=1, max_length=255)
     content: str = Field(min_length=1)

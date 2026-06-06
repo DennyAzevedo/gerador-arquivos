@@ -62,3 +62,22 @@ export async function updateArticle(id: string, input: UpdateArticleInput): Prom
 export async function deleteArticle(id: string): Promise<void> {
   await apiClient.delete(`/articles/${id}`);
 }
+
+interface WordPressPublishResponse {
+  post_id: string;
+  post_url: string;
+  mocked: boolean;
+  message: string;
+}
+
+export async function publishArticleToWordPress(id: string): Promise<WordPressPublishResult> {
+  const { data } = await apiClient.post<WordPressPublishResponse>(
+    `/articles/${id}/publish-wordpress`,
+  );
+  return {
+    postId: data.post_id,
+    postUrl: data.post_url,
+    mocked: data.mocked,
+    message: data.message,
+  };
+}

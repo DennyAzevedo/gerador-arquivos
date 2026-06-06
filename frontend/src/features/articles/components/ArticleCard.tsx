@@ -7,9 +7,17 @@ interface ArticleCardProps {
   article: Article;
   onEdit: (id: string) => void;
   onDelete: (id: string) => void;
+  onPublishWordPress: (id: string) => void;
+  isPublishing?: boolean;
 }
 
-export function ArticleCard({ article, onEdit, onDelete }: ArticleCardProps) {
+export function ArticleCard({
+  article,
+  onEdit,
+  onDelete,
+  onPublishWordPress,
+  isPublishing = false,
+}: ArticleCardProps) {
   const [confirmOpened, { open, close }] = useDisclosure(false);
 
   const isPublished = article.status === "published";
@@ -38,6 +46,15 @@ export function ArticleCard({ article, onEdit, onDelete }: ArticleCardProps) {
       </Text>
 
       <Group mt="md" gap="xs">
+        <Button
+          size="xs"
+          variant="light"
+          color="blue"
+          loading={isPublishing}
+          onClick={() => onPublishWordPress(article.id)}
+        >
+          Publicar no WordPress
+        </Button>
         <Button size="xs" variant="light" onClick={() => onEdit(article.id)}>
           Editar
         </Button>

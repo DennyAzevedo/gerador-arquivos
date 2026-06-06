@@ -19,6 +19,7 @@ A documentação completa está na pasta [`docs/`](docs/README.md):
 
 - Autenticação JWT (registro, login, sessão)
 - Geração de artigos via Gemini (tema, palavras-chave, tom)
+- Publicação no WordPress (mock por padrão; integração real configurável)
 - Preview editável antes de salvar
 - CRUD de artigos (rascunho / publicado)
 - Interface responsiva (React + Mantine)
@@ -91,6 +92,10 @@ Edite o `.env` com suas credenciais reais. **Nunca commite o arquivo `.env`** �
 | `DATABASE_URL` | Conexão async do backend ao PostgreSQL |
 | `GEMINI_API_KEY` | Chave da API Gemini ([Google AI Studio](https://aistudio.google.com/apikey)) |
 | `GEMINI_MODEL` | Modelo Gemini (padrão: `gemini-2.0-flash`) |
+| `WORDPRESS_MOCK` | `true` = envio simulado (padrão); `false` = publicação real |
+| `WORDPRESS_URL` | URL base do blog (ex.: `https://meublog.com`) |
+| `WORDPRESS_USERNAME` | Usuário WordPress (obrigatório se mock=false) |
+| `WORDPRESS_APP_PASSWORD` | Senha de aplicativo WordPress (obrigatório se mock=false) |
 | `JWT_SECRET` | Segredo para tokens JWT (mín. 32 caracteres em produção) |
 | `CORS_ORIGINS` | Origens permitidas (ex.: `http://localhost:5173`) |
 | `VITE_API_URL` | URL do backend acessada pelo navegador |
@@ -132,6 +137,7 @@ docker compose up --build
 3. Em **Gerar artigo**, informe tema/palavras-chave e clique em **Gerar**
 4. Revise o conteúdo gerado e **Salvar**
 5. Gerencie artigos no **Dashboard** (editar, excluir, alterar status)
+6. Clique em **Publicar no WordPress** para enviar (simulado enquanto `WORDPRESS_MOCK=true`)
 
 ## Testes
 
@@ -175,7 +181,7 @@ docker compose run --rm --no-deps frontend sh -c "npm install && npm run test"
 
 ### Próximos passos
 
-- [ ] Integração com WordPress REST API (publicação automática)
+- [x] Integração WordPress mockada (porta + adapter + endpoint + UI)
 - [ ] Agendamento de publicações
 - [ ] CI/CD (GitHub Actions: lint, testes, build)
 - [ ] Preview Markdown renderizado no frontend

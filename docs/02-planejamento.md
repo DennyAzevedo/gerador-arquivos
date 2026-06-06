@@ -9,7 +9,7 @@ Aplicação web conteinerizada que permite a um usuário autenticado:
 1. Gerar artigos via Gemini a partir de um tema/parâmetros.
 2. Revisar e editar o conteúdo gerado.
 3. Salvar os artigos no PostgreSQL.
-4. (Futuro) Publicar no WordPress via REST API.
+4. Publicar no WordPress via REST API (mock habilitado por padrão; integração real quando configurada).
 
 ## 2. Princípios arquiteturais
 
@@ -55,6 +55,7 @@ backend/
 │           │   ├── repositories/    # implementações dos repositórios
 │           │   └── session.py       # engine async + sessão
 │           ├── gemini/              # adapter do SDK do Gemini
+│           └── wordpress/           # adapter mock + REST do WordPress
 │           └── auth/                # config fastapi-users / JWT
 └── tests/
     ├── unit/                        # domínio, casos de uso, validadores, mappers
@@ -129,6 +130,7 @@ frontend/
 | GET | `/articles/{id}` | Detalha artigo | Sim |
 | PUT | `/articles/{id}` | Edita artigo | Sim |
 | DELETE | `/articles/{id}` | Remove artigo | Sim |
+| POST | `/articles/{id}/publish-wordpress` | Publica artigo no WordPress (mock ou REST) | Sim |
 | GET | `/health` | Healthcheck do container | Não |
 
 ## 6. Fluxo de telas (UX)
@@ -158,6 +160,10 @@ POSTGRES_DB=gerador_artigos
 DATABASE_URL=postgresql+asyncpg://seu_usuario:sua_senha@host.docker.internal:5432/gerador_artigos
 GEMINI_API_KEY=...
 GEMINI_MODEL=gemini-2.0-flash
+WORDPRESS_MOCK=true
+WORDPRESS_URL=https://seu-blog.wordpress.com
+WORDPRESS_USERNAME=
+WORDPRESS_APP_PASSWORD=
 JWT_SECRET=troque-este-segredo
 CORS_ORIGINS=http://localhost:5173
 VITE_API_URL=http://localhost:8000
@@ -168,4 +174,4 @@ VITE_API_URL=http://localhost:8000
 - Modelo do Gemini configurável por env (`GEMINI_MODEL`, padrão `gemini-2.0-flash`).
 - UUID como PK de usuários e artigos.
 - Geração **não** salva automaticamente — usuário revisa antes (melhor UX e controle de custo).
-- Publicação no WordPress fica para fase futura.
+- Publicação no WordPress: mock por padrão (`WORDPRESS_MOCK=true`); integração real via REST API quando `WORDPRESS_MOCK=false` e credenciais configuradas.

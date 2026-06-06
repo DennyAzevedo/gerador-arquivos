@@ -5,6 +5,11 @@ from app.application.articles.ports.article_generator import (
     ArticleGenerator,
     GeneratedArticle,
 )
+from app.application.articles.ports.wordpress_publisher import (
+    WordPressArticlePayload,
+    WordPressPublisher,
+    WordPressPublishResult,
+)
 from app.domain.articles.entities import Article
 from app.domain.articles.exceptions import ArticleNotFoundError
 from app.domain.articles.repository import ArticleRepository
@@ -44,6 +49,24 @@ class FakeArticleGenerator(ArticleGenerator):
 
     async def generate(self, data: ArticleGenerationInput) -> GeneratedArticle:
         self.last_input = data
+        if self._error:
+            raise self._error
+        return self._result
+
+
+class FakeWordPressPublisher(WordPressPublisher):
+    def __init__(self, result: WordPressPublishResult | None = None, error: Exception | None = None) -> None:
+        self._result = result or WordPressPublishResult(
+            post_id="mock-123",
+            post_url="https://exemplo.wordpress.com/?p=mock-123",
+            mocked=True,
+            message="Artigo enviado ao WordPress (simulado).",
+        )
+        self._error = error
+        self.last_payload: WordPressArticlePayload | None = None
+
+    async def publish(self, article: WordPressArticlePayload) -> WordPressPublishResult:
+        self.last_payload = article
         if self._error:
             raise self._error
         return self._result

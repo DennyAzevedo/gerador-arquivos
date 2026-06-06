@@ -9,6 +9,10 @@ class Settings(BaseSettings):
     database_url: str
     gemini_api_key: str
     gemini_model: str = "gemini-2.0-flash"
+    wordpress_mock: bool = True
+    wordpress_url: str = "https://seu-blog.wordpress.com"
+    wordpress_username: str = ""
+    wordpress_app_password: str = ""
     jwt_secret: str
     cors_origins: str = "http://localhost:5173"
 

@@ -1,8 +1,8 @@
-from app.api.dependencies.services import get_article_generator
-from app.application.articles.exceptions import ArticleGenerationError
+from app.api.dependencies.services import get_article_generator, get_wordpress_publisher
+from app.application.articles.exceptions import ArticleGenerationError, WordPressPublishError
 from app.application.articles.ports.article_generator import GeneratedArticle
 from app.main import app
-from tests.support.fakes import FakeArticleGenerator
+from tests.support.fakes import FakeArticleGenerator, FakeWordPressPublisher
 
 
 async def test_articles_crud_flow(client, auth_headers) -> None:
@@ -117,3 +117,71 @@ async def test_generate_article_failure_returns_502(client, auth_headers) -> Non
         assert response.status_code == 502
     finally:
         app.dependency_overrides.pop(get_article_generator, None)
+
+
+async def test_publish_wordpress_success_with_mock(client, auth_headers) -> None:
+    create = await client.post(
+        "/articles",
+        headers=auth_headers,
+        json={
+            "title": "Artigo WP",
+            "content": "Conteúdo",
+            "topic": "wordpress",
+            "status": "draft",
+        },
+    )
+    article_id = create.json()["id"]
+
+    app.dependency_overrides[get_wordpress_publisher] = lambda: FakeWordPressPublisher()
+    try:
+        response = await client.post(
+            f"/articles/{article_id}/publish-wordpress",
+            headers=auth_headers,
+        )
+        assert response.status_code == 200
+        body = response.json()
+        assert body["mocked"] is True
+        assert "simulado" in body["message"].lower()
+
+        detail = await client.get(f"/articles/{article_id}", headers=auth_headers)
+        assert detail.json()["status"] == "published"
+    finally:
+        app.dependency_overrides.pop(get_wordpress_publisher, None)
+
+
+async def test_publish_wordpress_not_found(client, auth_headers) -> None:
+    app.dependency_overrides[get_wordpress_publisher] = lambda: FakeWordPressPublisher()
+    try:
+        response = await client.post(
+            "/articles/00000000-0000-0000-0000-000000000099/publish-wordpress",
+            headers=auth_headers,
+        )
+        assert response.status_code == 404
+    finally:
+        app.dependency_overrides.pop(get_wordpress_publisher, None)
+
+
+async def test_publish_wordpress_failure_returns_502(client, auth_headers) -> None:
+    create = await client.post(
+        "/articles",
+        headers=auth_headers,
+        json={
+            "title": "Artigo WP",
+            "content": "Conteúdo",
+            "topic": "wordpress",
+            "status": "draft",
+        },
+    )
+    article_id = create.json()["id"]
+
+    app.dependency_overrides[get_wordpress_publisher] = lambda: FakeWordPressPublisher(
+        error=WordPressPublishError("Falha ao publicar")
+    )
+    try:
+        response = await client.post(
+            f"/articles/{article_id}/publish-wordpress",
+            headers=auth_headers,
+        )
+        assert response.status_code == 502
+    finally:
+        app.dependency_overrides.pop(get_wordpress_publisher, None)

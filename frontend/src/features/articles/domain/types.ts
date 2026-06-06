@@ -39,3 +39,10 @@ export interface UpdateArticleInput {
   tone?: string | null;
   status?: ArticleStatus;
 }
+
+export interface WordPressPublishResult {
+  postId: string;
+  postUrl: string;
+  mocked: boolean;
+  message: string;
+}

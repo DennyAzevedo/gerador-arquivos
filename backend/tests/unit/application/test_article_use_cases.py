@@ -5,6 +5,9 @@ import pytest
 from app.application.articles.commands.create_article import CreateArticleInput, CreateArticleUseCase
 from app.application.articles.commands.delete_article import DeleteArticleUseCase
 from app.application.articles.commands.generate_article import GenerateArticleUseCase
+from app.application.articles.commands.publish_article_to_wordpress import (
+    PublishArticleToWordPressUseCase,
+)
 from app.application.articles.commands.update_article import UpdateArticleInput, UpdateArticleUseCase
 from app.application.articles.exceptions import ArticleGenerationError
 from app.application.articles.ports.article_generator import ArticleGenerationInput
@@ -12,7 +15,7 @@ from app.application.articles.queries.get_article import GetArticleUseCase
 from app.application.articles.queries.list_articles import ListArticlesUseCase
 from app.domain.articles.entities import ArticleStatus
 from app.domain.articles.exceptions import ArticleNotFoundError
-from tests.support.fakes import FakeArticleGenerator, FakeArticleRepository
+from tests.support.fakes import FakeArticleGenerator, FakeArticleRepository, FakeWordPressPublisher
 
 
 @pytest.fixture
@@ -138,3 +141,28 @@ async def test_generate_article_propagates_errors() -> None:
     use_case = GenerateArticleUseCase(generator)
     with pytest.raises(ArticleGenerationError):
         await use_case.execute(ArticleGenerationInput(topic="Python"))
+
+
+async def test_publish_to_wordpress_updates_status(
+    repository: FakeArticleRepository,
+    user_id,
+) -> None:
+    created = await CreateArticleUseCase(repository).execute(
+        CreateArticleInput(
+            user_id=user_id,
+            title="Para WP",
+            content="Conteúdo",
+            topic="Tema",
+        )
+    )
+    publisher = FakeWordPressPublisher()
+    use_case = PublishArticleToWordPressUseCase(repository, publisher)
+
+    result = await use_case.execute(created.id, user_id)
+
+    assert result.mocked is True
+    assert publisher.last_payload is not None
+    assert publisher.last_payload.title == "Para WP"
+    updated = await repository.get_by_id(created.id)
+    assert updated is not None
+    assert updated.status == ArticleStatus.PUBLISHED

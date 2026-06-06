@@ -3,13 +3,14 @@ from uuid import UUID
 from fastapi import APIRouter, Depends, HTTPException, status
 
 from app.api.dependencies.repositories import get_article_repository
-from app.api.dependencies.services import get_article_generator
+from app.api.dependencies.services import get_article_generator, get_wordpress_publisher
 from app.api.schemas.article import (
     ArticleCreateRequest,
     ArticleResponse,
     ArticleUpdateRequest,
     GenerateArticleRequest,
     GeneratedArticleResponse,
+    WordPressPublishResponse,
 )
 from app.application.articles.commands.create_article import (
     CreateArticleInput,
@@ -17,15 +18,19 @@ from app.application.articles.commands.create_article import (
 )
 from app.application.articles.commands.delete_article import DeleteArticleUseCase
 from app.application.articles.commands.generate_article import GenerateArticleUseCase
+from app.application.articles.commands.publish_article_to_wordpress import (
+    PublishArticleToWordPressUseCase,
+)
 from app.application.articles.commands.update_article import (
     UpdateArticleInput,
     UpdateArticleUseCase,
 )
-from app.application.articles.exceptions import ArticleGenerationError
+from app.application.articles.exceptions import ArticleGenerationError, WordPressPublishError
 from app.application.articles.ports.article_generator import (
     ArticleGenerationInput,
     ArticleGenerator,
 )
+from app.application.articles.ports.wordpress_publisher import WordPressPublisher
 from app.application.articles.queries.get_article import GetArticleUseCase
 from app.application.articles.queries.list_articles import ListArticlesUseCase
 from app.domain.articles.repository import ArticleRepository
@@ -130,3 +135,26 @@ async def delete_article(
 ) -> None:
     use_case = DeleteArticleUseCase(repository)
     await use_case.execute(article_id, user.id)
+
+
+@router.post("/{article_id}/publish-wordpress", response_model=WordPressPublishResponse)
+async def publish_article_to_wordpress(
+    article_id: UUID,
+    user: UserModel = Depends(current_active_user),
+    repository: ArticleRepository = Depends(get_article_repository),
+    publisher: WordPressPublisher = Depends(get_wordpress_publisher),
+) -> WordPressPublishResponse:
+    use_case = PublishArticleToWordPressUseCase(repository, publisher)
+    try:
+        result = await use_case.execute(article_id, user.id)
+    except WordPressPublishError as exc:
+        raise HTTPException(
+            status_code=status.HTTP_502_BAD_GATEWAY,
+            detail=str(exc),
+        ) from exc
+    return WordPressPublishResponse(
+        post_id=result.post_id,
+        post_url=result.post_url,
+        mocked=result.mocked,
+        message=result.message,
+    )
