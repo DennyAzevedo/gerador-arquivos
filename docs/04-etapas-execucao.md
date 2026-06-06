@@ -23,7 +23,7 @@ Roteiro de fases do projeto. **Este é um documento vivo**: a cada passo/fase co
 | 7 | Frontend — geração e gestão de artigos | ✅ Concluído |
 | 8 | Integração ponta a ponta e ajustes de UX | ✅ Concluído |
 | 9 | Testes automatizados | ✅ Concluído |
-| 10 | Documentação final e revisão | ⬜ Pendente |
+| 10 | Documentação final e revisão | ✅ Concluído |
 
 ---
 
@@ -172,14 +172,16 @@ docker compose run --rm \
 docker compose run --rm --no-deps frontend sh -c "npm install && npm run test"
 ```
 
-> **Resultado:** backend **20 passed**; frontend **13 passed** (6 arquivos).
+> **Resultado:** backend **22 passed**; frontend **13 passed** (6 arquivos).
 
-## Fase 10 — Documentação final ⬜
+## Fase 10 — Documentação final ✅
 
-- [ ] Atualizar `README.md` com instruções completas (build, execução, testes, variáveis de ambiente)
-- [ ] Revisar todos os documentos de `docs/`
-- [ ] Registrar roadmap futuro (publicação WordPress, CI/CD opcional)
-- [ ] Validar `.env.example` alinhado ao estado atual do projeto
+- [x] Atualizar `README.md` com instruções completas (build, execução, testes, variáveis de ambiente, segurança)
+- [x] Revisar documentos de `docs/` (stack, planejamento, regras, etapas)
+- [x] Registrar roadmap futuro (WordPress, CI/CD, agendamento, preview Markdown)
+- [x] Validar `.env.example` alinhado ao estado atual (comentários, JWT 32 chars, URL encoding, TEST_DATABASE_URL)
+
+> **Entregável:** README operacional para subir, usar e testar o projeto do zero. Segredos permanecem fora do Git (`.env` ignorado; apenas `.env.example` versionado).
 
 ---
 
@@ -198,4 +200,5 @@ Registre aqui cada avanço relevante (data, fase, resumo).
 | 2026-06-05 | 6 | Frontend auth: feature `auth` completa (types, service, hooks de mutation, `AuthContext`, formulários com `@mantine/form`, páginas Login/Registro), rotas protegidas (`RequireAuth`) e logout no layout. Tratamento de loading/erro. Validados typecheck, lints, CORS e integração (registro 201, login token, /users/me 200). |
 | 2026-06-06 | 7 | Frontend artigos: feature `articles` (service, hooks query/mutation, `ArticleCard`, `ArticleForm`, `GenerateArticleForm`), Dashboard com lista/ações, geração com preview editável e página de edição. Notificações e estados loading/vazio/erro. `HomePage` removida. Validados typecheck, lints e CRUD integrado (201/200/200/204/404). |
 | 2026-06-06 | 8 | Integração E2E: stack completa validada; interceptor 401 global, `RequireGuest`, return URL no login, logout com redirect, erros amigáveis ampliados, UX responsiva no layout/auth. E2E API: register→CRUD→delete OK; 401 e 502 tratados. Fase 9 detalhada no planejamento. |
-| 2026-06-06 | 9 | Testes automatizados: backend pytest (20 testes — unit/application/domain, integration repositório, API auth/articles/health) com banco `gerador_artigos_test`; frontend Vitest (13 testes — lib, auth, dashboard). Comandos documentados em `docs/04`. |
+| 2026-06-06 | 9 | Testes automatizados: backend pytest (22 testes — unit/application/domain, integration repositório, API auth/articles/health) com banco `gerador_artigos_test`; frontend Vitest (13 testes — lib, auth, dashboard). Comandos documentados em `docs/04`. |
+| 2026-06-06 | 10 | Documentação final: `README.md` reescrito (setup, execução, testes, segurança, roadmap); `.env.example` revisado; Fase 10 concluída. Projeto MVP entregue. |

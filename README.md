@@ -1,87 +1,182 @@
 # Gerador de Artigos para WordPress
 
-Gerador de artigos com Inteligência Artificial para publicação em blog WordPress. O sistema utiliza a API da OpenAI para gerar conteúdo, oferece uma interface web para configuração e revisão, e integra-se ao WordPress para publicação dos artigos.
+Gerador de artigos com Inteligência Artificial para publicação em blog WordPress. O sistema utiliza a API da OpenAI para gerar conteúdo, oferece uma interface web para configuração e revisão, e persiste os artigos em PostgreSQL.
 
 > **Nota sobre o desenvolvimento:** Este projeto é desenvolvido integralmente com o [Cursor](https://cursor.com) como ferramenta de codificação assistida por IA, **sem intervenção manual no código**. O objetivo é validar e demonstrar um fluxo de desenvolvimento orientado por agentes de IA.
 
 ## Documentação
 
-A documentação completa do projeto está na pasta [`docs/`](docs/README.md):
+A documentação completa está na pasta [`docs/`](docs/README.md):
 
-- [01 — Stack Tecnológica](docs/01-stack.md)
-- [02 — Planejamento e Arquitetura](docs/02-planejamento.md)
-- [03 — Regras de Codificação](docs/03-regras-codificacao.md)
-- [04 — Etapas de Execução](docs/04-etapas-execucao.md) (roteiro vivo, atualizado a cada fase)
+| Documento | Conteúdo |
+| --------- | -------- |
+| [01 — Stack](docs/01-stack.md) | Tecnologias e justificativas |
+| [02 — Planejamento](docs/02-planejamento.md) | Arquitetura, pastas, API |
+| [03 — Regras](docs/03-regras-codificacao.md) | Padrões de codificação |
+| [04 — Etapas](docs/04-etapas-execucao.md) | Roteiro de fases (concluído) |
 
-## Visão Geral
+## Funcionalidades
 
-O objetivo do projeto é automatizar a criação e publicação de artigos em um blog WordPress, reduzindo o esforço manual de produção de conteúdo. O fluxo geral é:
-
-1. O usuário define o tema, palavras-chave e parâmetros do artigo na interface web.
-2. O backend aciona a API da OpenAI para gerar o conteúdo do artigo.
-3. O usuário pode revisar e ajustar os parâmetros antes da publicação.
-4. O artigo é enviado para o WordPress via API REST.
+- Autenticação JWT (registro, login, sessão)
+- Geração de artigos via OpenAI (tema, palavras-chave, tom)
+- Preview editável antes de salvar
+- CRUD de artigos (rascunho / publicado)
+- Interface responsiva (React + Mantine)
 
 ## Arquitetura
 
 ```
-┌─────────────┐      ┌──────────────┐      ┌─────────────┐
-│  Frontend   │ ───► │   Backend    │ ───► │   OpenAI    │
-│  (React.js) │      │   (Python)   │      │     API     │
-└─────────────┘      └──────┬───────┘      └─────────────┘
-                            │
-                            ▼
-                     ┌──────────────┐
-                     │  WordPress   │
-                     │   REST API   │
-                     └──────────────┘
+   Docker Compose                              Host
+┌──────────────┐      ┌──────────────┐      ┌──────────────────┐
+│  frontend    │─────►│   backend    │─────►│  PostgreSQL      │
+│ React+Vite   │ HTTP │   FastAPI    │ SQL  │  (container host)│
+│ Mantine :5173│◄─────│   :8000      │◄─────│  localhost:5432  │
+└──────────────┘      └──────┬───────┘      └──────────────────┘
+                             │ HTTPS
+                             ▼
+                        OpenAI API
 ```
 
-## Tecnologias
+O PostgreSQL **não** faz parte do `docker-compose.yml`: o backend conecta a uma instância existente no host via `host.docker.internal:5432`.
 
-| Camada        | Tecnologia                          |
-| ------------- | ----------------------------------- |
-| Frontend      | React.js                            |
-| Backend       | Python                              |
-| IA / Geração  | OpenAI API                          |
-| Publicação    | WordPress REST API                  |
-| Ferramenta    | Cursor (desenvolvimento via IA)     |
+## Stack
 
-## Estrutura do Projeto
+| Camada | Tecnologia |
+| ------ | ---------- |
+| Frontend | React 19, TypeScript, Vite, Mantine 9, TanStack Query, React Router |
+| Backend | Python 3.12, FastAPI, SQLAlchemy 2 (async), Alembic, Pydantic, fastapi-users |
+| IA | OpenAI SDK (`gpt-4o-mini` por padrão) |
+| Banco | PostgreSQL |
+| Infra | Docker Compose (frontend + backend) |
 
-> A estrutura será detalhada conforme o projeto evolui.
+## Estrutura do projeto
 
 ```
 gerador-arquivos/
-├── frontend/   # Aplicação React.js (a ser criada)
-├── backend/    # API e lógica em Python (a ser criada)
-├── LICENSE
+├── backend/
+│   ├── src/app/           # api, application, domain, infrastructure
+│   ├── migrations/        # Alembic
+│   ├── tests/             # pytest (unit, integration, api)
+│   ├── requirements.txt
+│   └── Dockerfile
+├── frontend/
+│   ├── src/               # features (auth, articles), shared, app
+│   ├── tests/             # Vitest
+│   ├── package.json
+│   └── Dockerfile
+├── docs/                  # documentação do projeto
+├── docker-compose.yml
+├── .env.example           # template de variáveis (versionado)
 └── README.md
 ```
 
 ## Pré-requisitos
 
-- Node.js (para o frontend React.js)
-- Python 3.x (para o backend)
-- Conta e chave de API da OpenAI
-- Site WordPress com a API REST habilitada e credenciais de acesso
+- [Docker](https://docs.docker.com/get-docker/) e Docker Compose
+- PostgreSQL acessível (container ou instalação local na porta `5432`)
+- Conta e chave de API da [OpenAI](https://platform.openai.com/)
 
-## Configuração
+## Configuração e execução
 
-> Instruções detalhadas de instalação e configuração serão adicionadas conforme o backend e o frontend forem implementados.
+### 1. Variáveis de ambiente
 
-As credenciais sensíveis (chave da OpenAI, credenciais do WordPress) deverão ser configuradas via variáveis de ambiente, nunca versionadas no repositório.
+```bash
+cp .env.example .env
+```
+
+Edite o `.env` com suas credenciais reais. **Nunca commite o arquivo `.env`** — ele já está no `.gitignore`.
+
+| Variável | Descrição |
+| -------- | --------- |
+| `DATABASE_URL` | Conexão async do backend ao PostgreSQL |
+| `OPENAI_API_KEY` | Chave da API OpenAI |
+| `OPENAI_MODEL` | Modelo (padrão: `gpt-4o-mini`) |
+| `JWT_SECRET` | Segredo para tokens JWT (mín. 32 caracteres em produção) |
+| `CORS_ORIGINS` | Origens permitidas (ex.: `http://localhost:5173`) |
+| `VITE_API_URL` | URL do backend acessada pelo navegador |
+
+**Senhas com caracteres especiais:** codifique na `DATABASE_URL` (ex.: `@` → `%40`).
+
+### 2. Banco de dados
+
+Crie o banco do projeto no PostgreSQL (se ainda não existir):
+
+```bash
+psql -U seu_usuario -c "CREATE DATABASE gerador_artigos;"
+```
+
+### 3. Migrações
+
+```bash
+docker compose run --rm backend alembic upgrade head
+```
+
+### 4. Subir a aplicação
+
+```bash
+docker compose up --build
+```
+
+| Serviço | URL |
+| ------- | --- |
+| Frontend | http://localhost:5173 |
+| Backend API | http://localhost:8000 |
+| Swagger (docs) | http://localhost:8000/docs |
+
+### 5. Fluxo de uso
+
+1. Acesse http://localhost:5173 e crie uma conta
+2. Faça login
+3. Em **Gerar artigo**, informe tema/palavras-chave e clique em **Gerar**
+4. Revise o conteúdo gerado e **Salvar**
+5. Gerencie artigos no **Dashboard** (editar, excluir, alterar status)
+
+## Testes
+
+Requer banco de testes `gerador_artigos_test` (separado do banco de desenvolvimento):
+
+```bash
+psql -U seu_usuario -c "CREATE DATABASE gerador_artigos_test;"
+```
+
+**Backend** (pytest — 22 testes):
+
+```bash
+docker compose run --rm \
+  -e DATABASE_URL="postgresql+asyncpg://USER:SENHA@host.docker.internal:5432/gerador_artigos_test" \
+  backend sh -c "pip install -r requirements-dev.txt && pytest"
+```
+
+**Frontend** (Vitest — 13 testes):
+
+```bash
+docker compose run --rm --no-deps frontend sh -c "npm install && npm run test"
+```
+
+## Segurança
+
+- Credenciais ficam **somente** no `.env` local (nunca versionado)
+- Use `.env.example` como referência com placeholders
+- Em produção, injete segredos via gerenciador de configuração (Vault, secrets do CI/CD, etc.)
+- Rotacione `JWT_SECRET`, senha do banco e `OPENAI_API_KEY` se houver exposição acidental
 
 ## Roadmap
 
-- [ ] Definir estrutura inicial do backend (Python)
-- [ ] Definir estrutura inicial do frontend (React.js)
-- [ ] Integração com a API da OpenAI para geração de artigos
-- [ ] Integração com a API REST do WordPress para publicação
-- [ ] Interface de configuração de parâmetros do artigo
-- [ ] Interface de revisão e edição antes da publicação
+### Concluído
+
+- [x] Backend FastAPI (camadas DDD, CQRS, OpenAI, CRUD)
+- [x] Frontend React + Mantine (auth, dashboard, geração, edição)
+- [x] Docker Compose (frontend + backend)
+- [x] Testes automatizados (pytest + Vitest)
+- [x] Documentação em `docs/`
+
+### Próximos passos
+
+- [ ] Integração com WordPress REST API (publicação automática)
 - [ ] Agendamento de publicações
-- [ ] Documentação de instalação e uso
+- [ ] CI/CD (GitHub Actions: lint, testes, build)
+- [ ] Preview Markdown renderizado no frontend
+- [ ] Suporte a múltiplos sites WordPress por usuário
 
 ## Licença
 

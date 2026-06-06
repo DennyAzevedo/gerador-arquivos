@@ -1,6 +1,6 @@
 # Documentação — Gerador de Artigos para WordPress
 
-Esta pasta concentra a documentação viva do projeto. Os documentos são atualizados continuamente conforme o projeto evolui.
+Documentação viva do projeto. **Todas as 10 fases do roteiro foram concluídas** — o MVP está operacional.
 
 > Projeto desenvolvido integralmente com o [Cursor](https://cursor.com), sem intervenção manual no código.
 
