@@ -27,8 +27,8 @@ class ArticleCreateRequest(BaseModel):
 
 
 class ArticleUpdateRequest(BaseModel):
-    title: str | None = Field(default=None, max_length=255)
-    content: str | None = None
+    title: str | None = Field(default=None, min_length=1, max_length=255)
+    content: str | None = Field(default=None, min_length=1)
     keywords: str | None = Field(default=None, max_length=500)
     tone: str | None = Field(default=None, max_length=100)
     status: ArticleStatus | None = None

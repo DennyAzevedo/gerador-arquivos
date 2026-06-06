@@ -41,6 +41,48 @@ async def test_articles_crud_flow(client, auth_headers) -> None:
     assert missing.status_code == 404
 
 
+async def test_update_article_rejects_empty_title(client, auth_headers) -> None:
+    create = await client.post(
+        "/articles",
+        headers=auth_headers,
+        json={
+            "title": "Artigo válido",
+            "content": "Conteúdo",
+            "topic": "validação",
+            "status": "draft",
+        },
+    )
+    article_id = create.json()["id"]
+
+    response = await client.put(
+        f"/articles/{article_id}",
+        headers=auth_headers,
+        json={"title": ""},
+    )
+    assert response.status_code == 422
+
+
+async def test_update_article_rejects_empty_content(client, auth_headers) -> None:
+    create = await client.post(
+        "/articles",
+        headers=auth_headers,
+        json={
+            "title": "Artigo válido",
+            "content": "Conteúdo",
+            "topic": "validação",
+            "status": "draft",
+        },
+    )
+    article_id = create.json()["id"]
+
+    response = await client.put(
+        f"/articles/{article_id}",
+        headers=auth_headers,
+        json={"content": ""},
+    )
+    assert response.status_code == 422
+
+
 async def test_articles_require_authentication(client) -> None:
     response = await client.get("/articles")
     assert response.status_code == 401
