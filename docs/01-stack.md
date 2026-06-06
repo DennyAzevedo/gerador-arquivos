@@ -9,7 +9,7 @@ Documento que registra a stack sugerida para o projeto e a justificativa de cada
 | Frontend | React + TypeScript + Vite + **Mantine** + TanStack Query + React Router |
 | Backend | Python + **FastAPI** + SQLAlchemy 2.0 (async) + Alembic + Pydantic |
 | Autenticação | JWT (OAuth2 password flow) via `fastapi-users` |
-| IA / Geração | OpenAI SDK (Python) |
+| IA / Geração | Google Gemini API (`google-genai`) |
 | Banco de dados | PostgreSQL (container existente no host, `localhost:5432`) |
 | Infraestrutura | Docker Compose (serviços: `frontend`, `backend`) |
 
@@ -24,17 +24,17 @@ Documento que registra a stack sugerida para o projeto e a justificativa de cada
 └──────────────┘      └──────┬───────┘      └──────────────────┘
                              │ HTTPS         (via host.docker.internal)
                              ▼
-                        OpenAI API
+                        Gemini API
 ```
 
 ## Backend — Python + FastAPI
 
-- **FastAPI**: framework assíncrono, ideal para chamadas com latência alta (OpenAI), com documentação automática (Swagger/OpenAPI) e validação nativa via Pydantic.
+- **FastAPI**: framework assíncrono, ideal para chamadas com latência alta (Gemini), com documentação automática (Swagger/OpenAPI) e validação nativa via Pydantic.
 - **SQLAlchemy 2.0 (async)** + **asyncpg**: ORM moderno com suporte assíncrono.
 - **Alembic**: versionamento e migração de schema.
 - **Pydantic / pydantic-settings**: DTOs e configuração via variáveis de ambiente.
 - **fastapi-users**: autenticação completa (registro, login, JWT, hash de senha) integrada ao PostgreSQL.
-- **OpenAI SDK**: integração oficial com a LLM geradora de artigos.
+- **google-genai**: SDK oficial do Google para a API Gemini (geração de artigos).
 - **Uvicorn**: servidor ASGI.
 
 ## Frontend — React + TypeScript + Vite
@@ -67,5 +67,13 @@ Variáveis sensíveis ficam em `.env` (não versionado), com um `.env.example` v
 - **UI**: Mantine (confirmado pelo usuário).
 - **Banco**: reutilizar o container existente `db-postgres` (PostgreSQL 18) no host, em vez de um serviço novo no Compose. Banco do projeto: `gerador_artigos`.
 - **Visualização do banco**: nenhuma ferramenta no Compose; uso externo do DataGrip.
-- **Modelo OpenAI**: configurável por variável de ambiente (padrão sugerido: `gpt-4o-mini`).
+- **Modelo Gemini**: configurável por variável de ambiente (padrão sugerido: `gemini-2.0-flash`).
 - **Publicação no WordPress**: prevista como etapa futura (roadmap), fora do primeiro ciclo.
+
+## Migração OpenAI → Gemini
+
+O projeto utilizava inicialmente a OpenAI (`infrastructure/openai`). A geração de artigos foi migrada para a **API Gemini** do Google:
+
+- Adapter em `infrastructure/gemini` (`GeminiArticleGenerator`)
+- Variáveis: `GEMINI_API_KEY` e `GEMINI_MODEL` (substituem `OPENAI_*`)
+- Chave obtida em [Google AI Studio](https://aistudio.google.com/apikey)

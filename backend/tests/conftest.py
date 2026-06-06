@@ -9,7 +9,7 @@ from sqlalchemy.pool import NullPool
 
 from tests.support.db_url import resolve_test_database_url
 
-os.environ.setdefault("OPENAI_API_KEY", "sk-test")
+os.environ.setdefault("GEMINI_API_KEY", "test-gemini-key")
 os.environ.setdefault("JWT_SECRET", "test-jwt-secret-for-pytest-min-32-chars")
 os.environ.setdefault("CORS_ORIGINS", "http://localhost:5173")
 os.environ["DATABASE_URL"] = resolve_test_database_url()

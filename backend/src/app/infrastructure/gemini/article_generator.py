@@ -1,7 +1,9 @@
 import json
 import logging
 
-from openai import AsyncOpenAI
+from google import genai
+from google.genai import types
+from pydantic import BaseModel
 
 from app.application.articles.exceptions import ArticleGenerationError
 from app.application.articles.ports.article_generator import (
@@ -21,33 +23,45 @@ SYSTEM_PROMPT = (
 )
 
 
-class OpenAIArticleGenerator(ArticleGenerator):
-    """Adapter que isola o SDK da OpenAI atrás da porta ArticleGenerator."""
+class _ArticleOutput(BaseModel):
+    title: str
+    content: str
+
+
+class GeminiArticleGenerator(ArticleGenerator):
+    """Adapter que isola o SDK do Gemini atrás da porta ArticleGenerator."""
 
     def __init__(self) -> None:
-        self._client = AsyncOpenAI(api_key=settings.openai_api_key)
-        self._model = settings.openai_model
+        self._client = genai.Client(api_key=settings.gemini_api_key)
+        self._model = settings.gemini_model
 
     async def generate(self, data: ArticleGenerationInput) -> GeneratedArticle:
+        prompt = f"{SYSTEM_PROMPT}\n\n{self._build_prompt(data)}"
         try:
-            response = await self._client.chat.completions.create(
+            response = await self._client.aio.models.generate_content(
                 model=self._model,
-                messages=[
-                    {"role": "system", "content": SYSTEM_PROMPT},
-                    {"role": "user", "content": self._build_prompt(data)},
-                ],
-                response_format={"type": "json_object"},
+                contents=prompt,
+                config=types.GenerateContentConfig(
+                    response_mime_type="application/json",
+                    response_schema=_ArticleOutput,
+                ),
             )
         except Exception as exc:
-            logger.exception("OpenAI generation request failed")
-            raise ArticleGenerationError("Falha ao gerar o artigo via OpenAI") from exc
+            logger.exception("Gemini generation request failed")
+            raise ArticleGenerationError("Falha ao gerar o artigo via Gemini") from exc
 
-        raw_content = response.choices[0].message.content or ""
+        if isinstance(response.parsed, _ArticleOutput):
+            return GeneratedArticle(
+                title=response.parsed.title,
+                content=response.parsed.content,
+            )
+
+        raw_content = response.text or ""
         try:
             payload = json.loads(raw_content)
             return GeneratedArticle(title=payload["title"], content=payload["content"])
         except (json.JSONDecodeError, KeyError, TypeError) as exc:
-            logger.error("Unexpected OpenAI response format: %s", raw_content[:500])
+            logger.error("Unexpected Gemini response format: %s", raw_content[:500])
             raise ArticleGenerationError("Resposta inválida do provedor de IA") from exc
 
     @staticmethod

@@ -17,7 +17,7 @@ Roteiro de fases do projeto. **Este é um documento vivo**: a cada passo/fase co
 | 1 | Infraestrutura (Docker Compose + Dockerfiles) | ✅ Concluído |
 | 2 | Backend — fundação (config, DB, domínio, camadas) | ✅ Concluído |
 | 3 | Backend — autenticação (JWT / fastapi-users) | ✅ Concluído |
-| 4 | Backend — geração de artigos (OpenAI) e CRUD | ✅ Concluído |
+| 4 | Backend — geração de artigos (Gemini) e CRUD | ✅ Concluído |
 | 5 | Frontend — fundação (Vite + Mantine + Router) | ✅ Concluído |
 | 6 | Frontend — autenticação (login/registro) | ✅ Concluído |
 | 7 | Frontend — geração e gestão de artigos | ✅ Concluído |
@@ -76,9 +76,9 @@ Roteiro de fases do projeto. **Este é um documento vivo**: a cada passo/fase co
 >
 > **Validação:** registro → `201`; login → `access_token`; `GET /users/me` com token → `200`; sem token → `401`. Usuário de teste removido após a validação. O `UserRepository` é a interface de domínio que será consumida pelos casos de uso de artigos (Fase 4); a persistência de auth usa o adapter do `fastapi-users`.
 
-## Fase 4 — Backend: artigos e OpenAI ✅
+## Fase 4 — Backend: artigos e Gemini ✅
 
-- [x] Adapter da OpenAI em `infrastructure/openai` (`OpenAIArticleGenerator`, JSON mode)
+- [x] Adapter do Gemini em `infrastructure/gemini` (`GeminiArticleGenerator`, JSON schema)
 - [x] Porta `ArticleGenerator` na camada de aplicação (+ `ArticleGenerationInput`/`GeneratedArticle`)
 - [x] Caso de uso de geração (`GenerateArticleUseCase`) — não persiste
 - [x] Repositório de artigos: port `ArticleRepository` (domínio) + `SqlAlchemyArticleRepository` + mapper
@@ -123,7 +123,7 @@ Roteiro de fases do projeto. **Este é um documento vivo**: a cada passo/fase co
 
 > **Rotas:** `/` (Dashboard), `/articles/generate`, `/articles/:articleId/edit` (todas sob `RequireAuth`). `HomePage` placeholder removida.
 >
-> **Validação:** typecheck strict OK, lints OK; CRUD validado com os contratos do frontend — CREATE `201`, LIST `200`, GET `200`, UPDATE `200`, DELETE `204`, GET pós-delete `404`. A geração real depende de `OPENAI_API_KEY` válida (com placeholder, o backend retorna `502` tratado). Interação visual a conferir no navegador.
+> **Validação:** typecheck strict OK, lints OK; CRUD validado com os contratos do frontend — CREATE `201`, LIST `200`, GET `200`, UPDATE `200`, DELETE `204`, GET pós-delete `404`. A geração real depende de `GEMINI_API_KEY` válida (com placeholder, o backend retorna `502` tratado). Interação visual a conferir no navegador.
 
 ## Fase 8 — Integração ponta a ponta ✅
 
@@ -135,7 +135,7 @@ Roteiro de fases do projeto. **Este é um documento vivo**: a cada passo/fase co
 - [x] Erros consistentes: `getApiErrorMessage` ampliado (validação FastAPI, rede, 401/404/502, códigos conhecidos)
 - [x] Evidências registradas no histórico
 
-> **Geração real:** continua dependendo de `OPENAI_API_KEY` válida no `.env` (placeholder retorna `502` tratado). **Validação automatizada:** FE `200`, backend ready, E2E CRUD `201/200/200/204`, token inválido `401`, generate `502`. Conferir fluxo visual no navegador em `http://localhost:5173` após `docker compose up`.
+> **Geração real:** continua dependendo de `GEMINI_API_KEY` válida no `.env` (placeholder retorna `502` tratado). **Validação automatizada:** FE `200`, backend ready, E2E CRUD `201/200/200/204`, token inválido `401`, generate `502`. Conferir fluxo visual no navegador em `http://localhost:5173` após `docker compose up`.
 
 ## Fase 9 — Testes automatizados ✅
 
@@ -202,3 +202,4 @@ Registre aqui cada avanço relevante (data, fase, resumo).
 | 2026-06-06 | 8 | Integração E2E: stack completa validada; interceptor 401 global, `RequireGuest`, return URL no login, logout com redirect, erros amigáveis ampliados, UX responsiva no layout/auth. E2E API: register→CRUD→delete OK; 401 e 502 tratados. Fase 9 detalhada no planejamento. |
 | 2026-06-06 | 9 | Testes automatizados: backend pytest (22 testes — unit/application/domain, integration repositório, API auth/articles/health) com banco `gerador_artigos_test`; frontend Vitest (13 testes — lib, auth, dashboard). Comandos documentados em `docs/04`. |
 | 2026-06-06 | 10 | Documentação final: `README.md` reescrito (setup, execução, testes, segurança, roadmap); `.env.example` revisado; Fase 10 concluída. Projeto MVP entregue. |
+| 2026-06-06 | — | Migração de provedor de IA: OpenAI → Gemini. Adapter em `infrastructure/gemini`, variáveis `GEMINI_API_KEY`/`GEMINI_MODEL`, dependência `google-genai`. Documentação atualizada. |

@@ -6,7 +6,7 @@ Detalhamento da arquitetura, estrutura de pastas, modelo de dados e contratos de
 
 Aplicação web conteinerizada que permite a um usuário autenticado:
 
-1. Gerar artigos via OpenAI a partir de um tema/parâmetros.
+1. Gerar artigos via Gemini a partir de um tema/parâmetros.
 2. Revisar e editar o conteúdo gerado.
 3. Salvar os artigos no PostgreSQL.
 4. (Futuro) Publicar no WordPress via REST API.
@@ -17,7 +17,7 @@ Aplicação web conteinerizada que permite a um usuário autenticado:
 - Domínio puro: sem dependência de frameworks, ORM ou SDKs externos.
 - ORM (SQLAlchemy) isolado na camada de infraestrutura; mapeamento explícito entre modelos ORM e entidades de domínio.
 - DTOs com Pydantic na camada de API; entidades de domínio nunca expostas diretamente.
-- Padrão **Repository** para persistência e **Adapter** para a OpenAI.
+- Padrão **Repository** para persistência e **Adapter** para o Gemini.
 - Testes em pasta `tests` separada, espelhando a estrutura da fonte.
 
 ## 3. Estrutura de pastas
@@ -44,7 +44,7 @@ backend/
 │       │   ├── articles/
 │       │   │   ├── commands/        # escrita (gerar, criar, editar, excluir)
 │       │   │   ├── queries/         # leitura (listar, detalhar)
-│       │   │   └── ports/           # interfaces (repositórios, gateway OpenAI)
+│       │   │   └── ports/           # interfaces (repositórios, gateway Gemini)
 │       │   └── auth/
 │       ├── domain/                  # DOMAIN (puro)
 │       │   ├── articles/            # entidades, value objects, contratos
@@ -54,11 +54,11 @@ backend/
 │           │   ├── models/          # modelos SQLAlchemy
 │           │   ├── repositories/    # implementações dos repositórios
 │           │   └── session.py       # engine async + sessão
-│           ├── openai/              # adapter do SDK da OpenAI
+│           ├── gemini/              # adapter do SDK do Gemini
 │           └── auth/                # config fastapi-users / JWT
 └── tests/
     ├── unit/                        # domínio, casos de uso, validadores, mappers
-    ├── integration/                 # repositórios, banco, adapter OpenAI
+    ├── integration/                 # repositórios, banco, adapter Gemini
     └── api/                         # endpoints, contratos, erros
 ```
 
@@ -123,7 +123,7 @@ frontend/
 | POST | `/auth/register` | Cadastro de usuário | Não |
 | POST | `/auth/jwt/login` | Login → retorna JWT | Não |
 | GET | `/users/me` | Dados do usuário logado | Sim |
-| POST | `/articles/generate` | Gera artigo via OpenAI (não salva) | Sim |
+| POST | `/articles/generate` | Gera artigo via Gemini (não salva) | Sim |
 | POST | `/articles` | Cria/salva artigo | Sim |
 | GET | `/articles` | Lista artigos do usuário | Sim |
 | GET | `/articles/{id}` | Detalha artigo | Sim |
@@ -156,8 +156,8 @@ POSTGRES_USER=seu_usuario
 POSTGRES_PASSWORD=sua_senha
 POSTGRES_DB=gerador_artigos
 DATABASE_URL=postgresql+asyncpg://seu_usuario:sua_senha@host.docker.internal:5432/gerador_artigos
-OPENAI_API_KEY=sk-...
-OPENAI_MODEL=gpt-4o-mini
+GEMINI_API_KEY=...
+GEMINI_MODEL=gemini-2.0-flash
 JWT_SECRET=troque-este-segredo
 CORS_ORIGINS=http://localhost:5173
 VITE_API_URL=http://localhost:8000
@@ -165,7 +165,7 @@ VITE_API_URL=http://localhost:8000
 
 ## 8. Decisões assumidas (reversíveis)
 
-- Modelo da OpenAI configurável por env (`OPENAI_MODEL`, padrão `gpt-4o-mini`).
+- Modelo do Gemini configurável por env (`GEMINI_MODEL`, padrão `gemini-2.0-flash`).
 - UUID como PK de usuários e artigos.
 - Geração **não** salva automaticamente — usuário revisa antes (melhor UX e controle de custo).
 - Publicação no WordPress fica para fase futura.

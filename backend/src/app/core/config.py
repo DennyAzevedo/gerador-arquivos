@@ -7,8 +7,8 @@ class Settings(BaseSettings):
     """Configurações da aplicação carregadas a partir de variáveis de ambiente."""
 
     database_url: str
-    openai_api_key: str
-    openai_model: str = "gpt-4o-mini"
+    gemini_api_key: str
+    gemini_model: str = "gemini-2.0-flash"
     jwt_secret: str
     cors_origins: str = "http://localhost:5173"
 
