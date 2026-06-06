@@ -180,6 +180,7 @@ docker compose run --rm --no-deps frontend sh -c "npm install && npm run test"
 - [x] Revisar documentos de `docs/` (stack, planejamento, regras, etapas)
 - [x] Registrar roadmap futuro (WordPress, CI/CD, agendamento, preview Markdown)
 - [x] Validar `.env.example` alinhado ao estado atual (comentários, JWT 32 chars, URL encoding, TEST_DATABASE_URL)
+- [x] Registrar prompts utilizados na construção (`docs/05-prompts.md`)
 
 > **Entregável:** README operacional para subir, usar e testar o projeto do zero. Segredos permanecem fora do Git (`.env` ignorado; apenas `.env.example` versionado).
 
@@ -203,3 +204,4 @@ Registre aqui cada avanço relevante (data, fase, resumo).
 | 2026-06-06 | 9 | Testes automatizados: backend pytest (22 testes — unit/application/domain, integration repositório, API auth/articles/health) com banco `gerador_artigos_test`; frontend Vitest (13 testes — lib, auth, dashboard). Comandos documentados em `docs/04`. |
 | 2026-06-06 | 10 | Documentação final: `README.md` reescrito (setup, execução, testes, segurança, roadmap); `.env.example` revisado; Fase 10 concluída. Projeto MVP entregue. |
 | 2026-06-06 | — | Integração WordPress mockada: porta `WordPressPublisher`, adapters mock/REST, endpoint `POST /articles/{id}/publish-wordpress`, botão na UI, variáveis no `.env`. |
+| 2026-06-06 | 10+ | Documentação finalizada: `docs/05-prompts.md` com registro cronológico dos 18 prompts utilizados na construção do projeto com Cursor. |

@@ -14,6 +14,7 @@ A documentação completa está na pasta [`docs/`](docs/README.md):
 | [02 — Planejamento](docs/02-planejamento.md) | Arquitetura, pastas, API |
 | [03 — Regras](docs/03-regras-codificacao.md) | Padrões de codificação |
 | [04 — Etapas](docs/04-etapas-execucao.md) | Roteiro de fases (concluído) |
+| [05 — Prompts](docs/05-prompts.md) | Prompts utilizados na construção com Cursor |
 
 ## Funcionalidades
 
@@ -177,6 +178,7 @@ docker compose run --rm --no-deps frontend sh -c "npm install && npm run test"
 - [x] Docker Compose (frontend + backend)
 - [x] Testes automatizados (pytest + Vitest)
 - [x] Documentação em `docs/`
+- [x] Registro de prompts de construção (`docs/05-prompts.md`)
 - [x] Migração OpenAI → Gemini
 
 ### Próximos passos
